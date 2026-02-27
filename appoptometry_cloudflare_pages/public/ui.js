@@ -2988,3 +2988,212 @@ lines.push('------------------------------------------------------------');
 
   safeCall('wireSyncUI', wireSyncUI);
 })();
+// ===== Cloudflare Sync (KV) =====
+(function () {
+  const API_URL = "/api/user-data";
+  const LS_KEY = "opto_sync_key_v1";
+
+  function ensureSyncUI() {
+    // cria uma caixa simples se não existir
+    let box = document.getElementById("cfSyncBox");
+    if (box) return box;
+
+    box = document.createElement("div");
+    box.id = "cfSyncBox";
+    box.style.cssText =
+      "position:fixed;right:12px;bottom:12px;z-index:9999;background:#111827;color:#fff;" +
+      "border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px;max-width:320px;" +
+      "font:14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, Arial;box-shadow:0 10px 30px rgba(0,0,0,.35)";
+
+    box.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <strong>Sincronização</strong>
+        <span id="cfSyncStatus" style="opacity:.8;font-size:12px;"></span>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <input id="cfSyncKey" placeholder="Chave (ex: geandre-001)" 
+               style="flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0b1220;color:#fff;outline:none;" />
+        <button id="cfSyncSaveKey" type="button"
+                style="padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#111827;color:#fff;cursor:pointer;">
+          Salvar
+        </button>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button id="cfSyncPull" type="button"
+                style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0b1220;color:#fff;cursor:pointer;">
+          Baixar da nuvem
+        </button>
+        <button id="cfSyncPush" type="button"
+                style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#0b1220;color:#fff;cursor:pointer;">
+          Enviar pra nuvem
+        </button>
+      </div>
+
+      <div style="margin-top:10px;opacity:.75;font-size:12px;">
+        Use a <b>mesma chave</b> no Windows e no iPhone/iPad.
+      </div>
+    `;
+
+    document.body.appendChild(box);
+    return box;
+  }
+
+  function setStatus(msg) {
+    const el = document.getElementById("cfSyncStatus");
+    if (el) el.textContent = msg || "";
+  }
+
+  function getKey() {
+    const input = document.getElementById("cfSyncKey");
+    return (input?.value || localStorage.getItem(LS_KEY) || "").trim();
+  }
+
+  function setKey(val) {
+    localStorage.setItem(LS_KEY, val);
+    const input = document.getElementById("cfSyncKey");
+    if (input) input.value = val;
+  }
+
+  // === Ajuste estes 2 métodos para o seu app ===
+  // Precisamos de um jeito de pegar e colocar os dados locais.
+  // Tentei usar chaves comuns de localStorage. Se no seu app for diferente,
+  // me diga qual key ele usa e eu adapto em 1 linha.
+  function readLocalData() {
+    // tenta achar um storage do app
+    const candidates = ["patients", "optoPatients", "appPatients", "claudeopto_patients", "patients_v1"];
+    for (const k of candidates) {
+      const v = localStorage.getItem(k);
+      if (v) {
+        try { JSON.parse(v); return { storageKey: k, raw: v }; } catch {}
+      }
+    }
+    // fallback: pega tudo (não ideal, mas funciona se você não sabe a key)
+    const all = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      all[k] = localStorage.getItem(k);
+    }
+    return { storageKey: "__ALL__", raw: JSON.stringify(all) };
+  }
+
+  function writeLocalData(rawOrObj) {
+    // se vier pacote "__ALL__", restaura todas as keys
+    let parsed = rawOrObj;
+    if (typeof rawOrObj === "string") parsed = JSON.parse(rawOrObj);
+
+    if (parsed && parsed.__ALL__ && typeof parsed.__ALL__ === "object") {
+      for (const [k, v] of Object.entries(parsed.__ALL__)) {
+        if (typeof v === "string") localStorage.setItem(k, v);
+      }
+      return;
+    }
+
+    // caso simples: salvar em uma key padrão "patients"
+    localStorage.setItem("patients", JSON.stringify(parsed.patients ?? parsed));
+  }
+
+  async function apiGet(syncKey) {
+    const res = await fetch(API_URL, {
+      method: "GET",
+      headers: { "X-Sync-Key": syncKey },
+    });
+    const text = await res.text();
+    return { ok: res.ok, status: res.status, text };
+  }
+
+  async function apiPost(syncKey, payload) {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Sync-Key": syncKey,
+      },
+      body: JSON.stringify(payload),
+    });
+    const text = await res.text();
+    return { ok: res.ok, status: res.status, text };
+  }
+
+  async function pull() {
+    const k = getKey();
+    if (k.length < 6) {
+      setStatus("Chave inválida");
+      return;
+    }
+    setStatus("Baixando...");
+    const r = await apiGet(k);
+    if (!r.ok) {
+      setStatus(`Erro ${r.status}`);
+      console.warn("SYNC GET error:", r.text);
+      return;
+    }
+    let data = {};
+    try { data = JSON.parse(r.text); } catch {}
+    // guarda tudo em "__ALL__" se você quiser restaurar o storage inteiro
+    // Aqui salvamos como patients por padrão (adapte se necessário)
+    writeLocalData(data);
+    setStatus("OK ✅ (recarregue)");
+  }
+
+  async function push() {
+    const k = getKey();
+    if (k.length < 6) {
+      setStatus("Chave inválida");
+      return;
+    }
+    setStatus("Enviando...");
+    const local = readLocalData();
+    // envia um payload padrão (você pode ajustar depois)
+    let patients = [];
+    try {
+      const parsed = JSON.parse(local.raw);
+      // se for __ALL__, mande tudo
+      if (local.storageKey === "__ALL__") {
+        const payload = { __ALL__: parsed, updatedAt: Date.now(), schemaVersion: 1 };
+        const r = await apiPost(k, payload);
+        if (!r.ok) { setStatus(`Erro ${r.status}`); console.warn(r.text); return; }
+        setStatus("OK ✅");
+        return;
+      }
+      // se for lista/obj de pacientes
+      patients = Array.isArray(parsed) ? parsed : (parsed.patients ?? []);
+    } catch {}
+
+    const payload = { patients, updatedAt: Date.now(), schemaVersion: 1 };
+    const r = await apiPost(k, payload);
+    if (!r.ok) {
+      setStatus(`Erro ${r.status}`);
+      console.warn("SYNC POST error:", r.text);
+      return;
+    }
+    setStatus("OK ✅");
+  }
+
+  function boot() {
+    ensureSyncUI();
+
+    // carrega key salva
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) setKey(saved);
+
+    document.getElementById("cfSyncSaveKey")?.addEventListener("click", () => {
+      const k = getKey();
+      if (k.length < 6) { setStatus("Chave min 6"); return; }
+      setKey(k);
+      setStatus("Chave salva");
+    });
+
+    document.getElementById("cfSyncPull")?.addEventListener("click", pull);
+    document.getElementById("cfSyncPush")?.addEventListener("click", push);
+
+    setStatus("Pronto");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
