@@ -2857,4 +2857,4 @@ function renderPatientList(){
 
   document.addEventListener('DOMContentLoaded', init);
 
-})();
+};
