@@ -2705,38 +2705,61 @@ function renderPatientList(){
     box.style.color = ok ? '#065f46' : '#7f1d1d';
   }
 
-  async function syncPull(){
-    const key = getSyncKey();
-    if(!key){ setSyncStatus('Informe a chave', false); return; }
-    setSyncStatus('Baixando...', true);
-    try{
-      const res = await fetch(SYNC_API_URL, { headers: { 'X-Sync-Key': key }});
-      if(res.status === 404){
-        setSyncStatus('Sem dados na nuvem', false);
-        try{ showToast('Nenhum dado encontrado na nuvem para essa chave.', false); }catch(_){}
-        return;
-      }
-      if(!res.ok){
-        const t = await res.text().catch(()=> '');
-        throw new Error('HTTP '+res.status+' '+t);
-      }
-      const data = await res.json();
-      if(data && Array.isArray(data.patients)){
-        state.patients = data.patients;
-        state.selectedId = null;
-        saveState();
-        renderPatients();
-        resetForms();
-        setSyncStatus('Baixado ✓', true);
-        try{ showToast('Dados baixados da nuvem.', true); }catch(_){}
-      }else{
-        throw new Error('Resposta inválida (esperado {patients:[...]})');
-      }
-    }catch(e){
-      console.error('syncPull failed', e);
-      setSyncStatus('Falhou', false);
-      try{ showToast('Falha ao baixar: '+(e.message||e), false); }catch(_){}
+ async function syncPull(){
+  const key = getSyncKey();
+  if(!key){
+    setSyncStatus('Informe a chave', false);
+    try{ showToast('Informe a chave de sincronização.', false); }catch(_){}
+    return;
+  }
+
+  setSyncStatus('Baixando...', true);
+
+  try{
+    const res = await fetch(SYNC_API_URL, { headers: { 'X-Sync-Key': key }});
+
+    if(res.status === 404){
+      setSyncStatus('Sem dados na nuvem', false);
+      try{ showToast('Nenhum dado encontrado na nuvem para essa chave.', false); }catch(_){}
+      return;
     }
+
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      throw new Error('HTTP '+res.status+(t ? ' — '+t : ''));
+    }
+
+    const data = await res.json();
+
+    if(!data || !Array.isArray(data.patients)){
+      throw new Error('Resposta inválida (esperado {patients:[...]})');
+    }
+
+    // aplica dados
+    state.patients = data.patients;
+    state.selectedId = null;
+    saveState();
+
+    // render/reset com fallback (não quebra se alguma função não existir)
+    if (typeof renderPatients === 'function') {
+      renderPatients();
+    } else if (typeof renderPatientList === 'function') {
+      renderPatientList();
+    }
+
+    if (typeof resetForms === 'function') resetForms();
+
+    setSyncStatus('Baixado ✓', true);
+    try{ showToast('Dados baixados da nuvem.', true); }catch(_){}
+
+  }catch(e){
+    console.error('syncPull failed', e);
+
+    const msg = (e && e.message) ? e.message : String(e);
+    setSyncStatus('Falhou', false);
+    try{ showToast('Falha ao baixar: ' + msg, false); }catch(_){}
+  }
+}
   }
 
   async function syncPush(){
