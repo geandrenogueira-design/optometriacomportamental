@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Sistema de Avaliação Visual (offline) — v4.3.14</title>
+  <style>
+    /* Tema claro (mais confortável em consultório) */
+    :root{
+      --bg:#f6f8fd;
+      --panel:#ffffff;
+      --panel2:#f2f5fb;
+      --text:#0f172a;
+      --muted:#4b5563;
+      --line:rgba(15,23,42,.12);
+      --accent:#2563eb;
+      --accent2:#0ea5e9;
+      --bad:#dc2626;
+      --ok:#16a34a;
+
+      /* Cores dos gráficos */
+      --chartText:#0f172a;
+      --chartAxis:rgba(15,23,42,.50);
+      --chartGrid:rgba(15,23,42,.12);
+      --chart1:#2563eb;
+      --chart2:#0ea5e9;
+      --chart3:#22c55e;
+      --chart4:#f59e0b;
+      --chart5:#a855f7;
+      --chart6:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(135deg,#ffffff,var(--bg));color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    .app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+    aside{border-right:1px solid var(--line);background:rgba(255,255,255,.85);backdrop-filter: blur(10px);padding:14px}
+    main{padding:16px}
+    h1{font-size:16px;margin:0 0 10px 0}
+    h2{font-size:15px;margin:0 0 8px 0}
+    .card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 0 rgba(15,23,42,.04)}
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 4px}
+    input,select,textarea{width:100%;padding:10px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);outline:none}
+    input:focus,select:focus,textarea:focus{border-color:rgba(37,99,235,.55);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+    textarea{min-height:70px;resize:vertical}
+    .row{display:grid;gap:10px}
+    .row2{grid-template-columns:1fr 1fr}
+    .row3{grid-template-columns:1fr 1fr 1fr}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{cursor:pointer;border:1px solid var(--line);background:rgba(37,99,235,.10);color:var(--text);padding:10px 12px;border-radius:12px}
+    button:hover{border-color:rgba(37,99,235,.45)}
+    button.secondary{background:rgba(15,23,42,.04)}
+    button.danger{background:rgba(220,38,38,.10)}
+    .nav button.active{border-color:rgba(37,99,235,.45);background:rgba(37,99,235,.12)}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .nav button{width:100%;text-align:left}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(15,23,42,.03);color:var(--muted);font-size:12px}
+    .muted{color:var(--muted)}
+    .tab{display:none}
+    .tab.active{display:block}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .k{font-size:12px;color:var(--muted)}
+    .v{font-size:14px}
+    .v.small{font-size:12px;color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .out{padding:10px;border:1px dashed rgba(15,23,42,.18);border-radius:12px;background:rgba(15,23,42,.03);overflow:auto}
+    .out pre{white-space:pre-wrap;margin:0}
+    canvas{width:100%;height:260px;background:#ffffff;border:1px solid var(--line);border-radius:12px}
+    .list{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+    .list button{border:none;border-bottom:1px solid var(--line);border-radius:0;background:transparent}
+    .list button:last-child{border-bottom:none}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(255,255,255,.92);border:1px solid rgba(15,23,42,.18);color:var(--text);padding:10px 12px;border-radius:999px;display:none;max-width:min(720px,95vw);box-shadow:0 10px 30px rgba(15,23,42,.12)}
+    .toast.show{display:block}
+    .toast.ok{border-color:rgba(107,255,149,.35)}
+    .toast.err{border-color:rgba(255,107,107,.35)}
+
+    /* Mobile / iPhone: layout em uma coluna */
+    @media (max-width: 900px){
+      .app{grid-template-columns:1fr}
+      aside{border-right:none;border-bottom:1px solid var(--line)}
+      main{padding:12px}
+      .nav{flex-direction:row;flex-wrap:wrap}
+      .nav button{width:auto;flex:1 1 46%;min-width:140px}
+      .split{grid-template-columns:1fr}
+      .row2,.row3{grid-template-columns:1fr}
+      canvas{height:220px}
+      .list{max-height:none}
+    }
+  
+
+/* --- Dashboard style (inspirado em admin UI) --- */
+.dash-shell{display:flex;flex-direction:column;gap:14px}
+.dash-topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.dash-title{margin:0;font-size:18px;letter-spacing:.2px}
+.dash-sub{margin-top:4px;color:var(--muted);font-size:13px}
+.dash-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
+.btn-primary{border:1px solid rgba(37,99,235,.55);background:var(--primary);color:#fff;padding:10px 12px;border-radius:12px;cursor:pointer;box-shadow:0 10px 18px rgba(37,99,235,.18)}
+.btn-primary:hover{background:var(--primary2)}
+.dash-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dash-card{border-radius:18px;padding:14px 14px 12px;color:#fff;box-shadow:0 14px 26px rgba(2,6,23,.12);position:relative;overflow:hidden;min-height:92px}
+.dash-card:before{content:"";position:absolute;inset:-40px;opacity:.18;background:radial-gradient(circle at 20% 10%, #fff 0%, transparent 45%)}
+.dash-card-k{font-size:12px;opacity:.92;letter-spacing:.3px}
+.dash-card-v{margin-top:8px;font-size:22px;font-weight:800;letter-spacing:.2px}
+.dash-card-s{margin-top:6px;font-size:12px;opacity:.88}
+.grad-pink{background:linear-gradient(135deg,#ef3b8b 0%,#7c3aed 95%)}
+.grad-purple{background:linear-gradient(135deg,#7c3aed 0%,#2563eb 95%)}
+.grad-blue{background:linear-gradient(135deg,#06b6d4 0%,#2563eb 95%)}
+.grad-orange{background:linear-gradient(135deg,#f59e0b 0%,#ef4444 95%)}
+    .grad-green{background:linear-gradient(135deg,#22c55e 0%,#0ea5e9 95%)}
+    .grad-slate{background:linear-gradient(135deg,#64748b 0%,#0f172a 95%)}
+
+.dash-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+.dash-panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:14px}
+.dash-panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px}
+.dash-panel-title{font-size:14px;font-weight:800;letter-spacing:.2px}
+.dash-panel-sub{font-size:12px;color:var(--muted)}
+#panel_nsuco_radar{width:100%;height:auto;border-radius:14px;background:#fff;border:1px solid var(--border)}
+@media (max-width: 1000px){
+  .dash-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dash-grid{grid-template-columns:1fr}
+}
+@media (max-width: 520px){
+  .dash-cards{grid-template-columns:1fr}
+}
+
+/* --- Melhorias Vergências --- */
+.hint{font-size:11px;margin-top:4px;min-height:16px;display:block}
+.hint.warning{color:var(--bad);font-weight:500}
+.hint.ok{color:var(--ok);font-weight:500}
+.hint.info{color:var(--accent);font-style:italic}
+.progress-badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;margin-left:8px}
+.progress-full{background:rgba(34,197,94,.15);color:var(--ok);border:1px solid rgba(34,197,94,.3)}
+.progress-partial{background:rgba(245,158,11,.15);color:#d97706;border:1px solid rgba(245,158,11,.3)}
+.summary-card{border-left:4px solid var(--accent);background:rgba(37,99,235,.03)}
+.summary-card.warning{border-left-color:var(--bad);background:rgba(220,38,38,.03)}
+.summary-card.ok{border-left-color:var(--ok);background:rgba(34,197,94,.03)}
+.summary-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.summary-status{font-size:16px;font-weight:700;letter-spacing:.3px}
+.summary-count{font-size:13px;color:var(--muted)}
+.summary-issues{display:flex;flex-direction:column;gap:6px}
+.issue-item{padding:8px 10px;background:rgba(220,38,38,.08);border-left:3px solid var(--bad);border-radius:6px;font-size:13px}
+.normal-item{padding:8px 10px;background:rgba(34,197,94,.08);border-left:3px solid var(--ok);border-radius:6px;font-size:13px}
+.comparison-table{width:100%;border-collapse:collapse;margin-top:10px}
+.comparison-table th,.comparison-table td{padding:8px;text-align:center;border-bottom:1px solid var(--line)}
+.comparison-table th{background:var(--panel2);font-weight:600;font-size:12px}
+.comparison-table .highlight{background:rgba(245,158,11,.12);font-weight:600}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>Sistema — offline (bundle)</h1>
+    <div class="pill">Paciente selecionado: <span id="selected_patient">nenhum</span></div>
+
+    <div class="nav">
+      <button data-tab="tab_pacientes">📁 Pacientes</button>
+      <button data-tab="tab_perfil">🧾 Perfil / Questionário</button>
+      <button data-tab="tab_tvps">👁️ TVPS-4</button>
+      <button data-tab="tab_dem">📚 DEM</button>
+      <button data-tab="tab_dtvp">✍️ DTVP-3</button>
+      <button data-tab="tab_nsuco">↔️ NSUCO</button>
+      <button data-tab="tab_binocular">🔭 Vergência & Acomodação</button>
+      <button data-tab="tab_visao_binocular">🧿 Visão binocular</button>
+      <button data-tab="tab_painel">📊 Painel integrado</button>
+      <button data-tab="tab_selftest">🧪 Self-Test</button>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="muted" style="font-size:12px;margin-bottom:6px">Dica</div>
+      <div class="muted" style="font-size:12px">
+        Rode em servidor local para evitar limitações de <code>file://</code>.
+        Ex.: <code>python -m http.server 8000</code> e abra <code>http://localhost:8000</code>.
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div id="tab_pacientes" class="tab active">
+      <div class="card">
+        <h2>Cadastro do paciente</h2>
+        <div class="row row2">
+          <div>
+            <label>Nome</label>
+            <input id="p_name" placeholder="Nome completo"/>
+          </div>
+          <div>
+            <label>CPF (opcional)</label>
+            <input id="p_cpf" placeholder="Somente números" inputmode="numeric"/>
+          </div>
+        </div>
+        <div class="row row2">
+          <div>
+            <label>Sexo</label>
+            <select id="p_sex">
+              <option value="">—</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+              <option value="O">Outro</option>
+            </select>
+          </div>
+          <div>
+            <label>Data de nascimento</label>
+            <input id="p_dob" type="date"/>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Observações</label>
+            <input id="p_notes" placeholder="Opcional"/>
+          </div>
+        </div>
+        <div class="btnRow">
+          <button id="btn_new" class="secondary">Novo</button>
+          <button id="btn_save">Salvar/Atualizar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Lista de pacientes</h2>
+        <div id="patient_list" class="list"></div>
+      </div>
+    </div>
+
+    <div id="tab_perfil" class="tab">
+      <div class="card">
+        <h2>Perfil do paciente (perguntas)</h2>
+        <div class="muted">Preencha e salve no prontuário do paciente selecionado.</div>
+        <label>Queixa principal / motivo</label>
+        <textarea id="q_main" placeholder="Ex.: dificuldade de leitura, dor de cabeça, perde linha..."></textarea>
+
+        <label>História breve</label>
+        <textarea id="q_history" placeholder="Ex.: início, frequência, contexto escolar, telas..."></textarea>
+
+        <label>Observações clínicas</label>
+        <textarea id="q_clinical" placeholder="Ex.: postura, atenção, compensações..."></textarea>
+
+        <div class="btnRow">
+          <button id="btn_questionnaire_save">Salvar Perfil</button>
+          <button id="btn_questionnaire_clear" class="secondary">Limpar</button>
+        </div>
+
+        <div style="margin-top:12px" class="out" id="questionnaire_out"></div>
+      </div>
+    </div>
+
+    <div id="tab_tvps" class="tab">
+      <div class="card">
+        <h2>TVPS-4 — Raw → Scaled (B.1) + soma → Standard (B.2/B.3) + Age Eq (B.4)</h2>
+        <div class="muted">Entradas por lista (sem digitação livre).</div>
+
+        <div class="row row3">
+          <div>
+            <label>DIS (Raw)</label>
+            <select id="tvps_raw_DIS"></select>
+          </div>
+          <div>
+            <label>MEM (Raw)</label>
+            <select id="tvps_raw_MEM"></select>
+          </div>
+          <div>
+            <label>SPA (Raw)</label>
+            <select id="tvps_raw_SPA"></select>
+          </div>
+        </div>
+
+        <div class="row row3">
+          <div>
+            <label>CON (Raw)</label>
+            <select id="tvps_raw_CON"></select>
+          </div>
+          <div>
+            <label>SEQ (Raw)</label>
+            <select id="tvps_raw_SEQ"></select>
+          </div>
+          <div>
+            <label>FGR (Raw)</label>
+            <select id="tvps_raw_FGR"></select>
+          </div>
+        </div>
+
+        <div class="row row2">
+          <div>
+            <label>CLO (Raw)</label>
+            <select id="tvps_raw_CLO"></select>
+          </div>
+          <div class="btnRow" style="align-items:end">
+            <button id="btn_tvps_calcular">Calcular</button>
+            <button id="btn_tvps_salvar">Salvar no paciente</button>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="out" id="tvps_out"></div>
+          <div>
+            <canvas id="tvps_chart" width="800" height="320"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab_dem" class="tab">
+      <div class="card">
+        <h2>DEM — somente lista + Z-score</h2>
+        <div class="muted">Sem digitação livre. Use a lista e calcule.</div>
+
+        <div class="row row3">
+          <div>
+            <label>Vertical (s)</label>
+            <select id="dem_v"></select>
+          </div>
+          <div>
+            <label>Horizontal (s)</label>
+            <select id="dem_h"></select>
+          </div>
+          <div>
+            <label>Erros (n)</label>
+            <select id="dem_err"></select>
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <button id="btn_dem_calcular">Calcular</button>
+          <button id="btn_dem_salvar">Salvar no paciente</button>
+        </div>
+
+        <div class="split">
+          <div class="out" id="dem_out"></div>
+          <div>
+            <canvas id="dem_chart" width="800" height="320"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab_dtvp" class="tab">
+      <div class="card">
+        <h2>DTVP-3 — Teste de Percepção Visual <span id="dtvp_progress" class="progress-badge progress-partial">0% preenchido</span></h2>
+        <div class="muted">Developmental Test of Visual Perception (3ª edição). Avalia percepção motora e visual-perceptiva.</div>
+      </div>
+
+      <div class="card">
+        <h2>🖊️ Integração Visuomotora (Percepção Motora Reduzida - MR)</h2>
+        <div class="muted small">Subtestes que requerem resposta motora (desenho/cópia)</div>
+        
+        <div class="row row2">
+          <div class="field-validated">
+            <label>Coordenação Olho-Mão (Raw)</label>
+            <select id="dtvp_raw_coordenacao_olho_mao" onchange="validateDTVPField('dtvp_raw_coordenacao_olho_mao')"></select>
+            <span id="dtvp_raw_coordenacao_olho_mao_hint" class="hint"></span>
+          </div>
+          <div class="field-validated">
+            <label>Cópia (Raw)</label>
+            <select id="dtvp_raw_copia" onchange="validateDTVPField('dtvp_raw_copia')"></select>
+            <span id="dtvp_raw_copia_hint" class="hint"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>👁️ Percepção Visual (Percepção Visual Geral - GVP)</h2>
+        <div class="muted small">Subtestes puramente visuais (sem resposta motora)</div>
+        
+        <div class="row row3">
+          <div class="field-validated">
+            <label>Figura-Fundo (Raw)</label>
+            <select id="dtvp_raw_figura_fundo" onchange="validateDTVPField('dtvp_raw_figura_fundo')"></select>
+            <span id="dtvp_raw_figura_fundo_hint" class="hint"></span>
+          </div>
+          <div class="field-validated">
+            <label>Fechamento Visual (Raw)</label>
+            <select id="dtvp_raw_fechamento_visual" onchange="validateDTVPField('dtvp_raw_fechamento_visual')"></select>
+            <span id="dtvp_raw_fechamento_visual_hint" class="hint"></span>
+          </div>
+          <div class="field-validated">
+            <label>Constância de Forma (Raw)</label>
+            <select id="dtvp_raw_constancia_forma" onchange="validateDTVPField('dtvp_raw_constancia_forma')"></select>
+            <span id="dtvp_raw_constancia_forma_hint" class="hint"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="btnRow">
+          <button id="btn_dtvp_calcular">Calcular</button>
+          <button id="btn_dtvp_copy_whatsapp" class="secondary">📋 Copiar p/ WhatsApp</button>
+          <button id="btn_dtvp_limpar" class="secondary">Limpar</button>
+          <button id="btn_dtvp_salvar">Salvar no paciente</button>
+        </div>
+      </div>
+
+      <div id="dtvp_out"></div>
+    </div>
+
+    <div id="tab_nsuco" class="tab">
+      <div class="card">
+        <h2>NSUCO — Pursuits & Saccades</h2>
+        <div class="muted">Pontuação 1–5. Salva no paciente e mostra resumo. (Head/Body combinado = pior dos dois)</div>
+
+        <h3 style="margin:10px 0 6px 0">Pursuits</h3>
+        <div class="row row3">
+          <div>
+            <label title="Ability: capacidade de realizar 5 ciclos de alternância de fixação entre dois estímulos.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Ability</label>
+            <select id="nsuco_pursuits_ability"></select>
+          </div>
+          <div>
+            <label title="Accuracy: capacidade de realizar 5 ciclos sem refixações corretivas.\n1=hiper/hipometria significativa; 2=grande a moderada; 3=leve porém constante; 4=leve porém intermitente; 5=sem refixações corretivas.">Accuracy</label>
+            <select id="nsuco_pursuits_accuracy"></select>
+          </div>
+          <div>
+            <label title="Head/Body movement: capacidade de realizar 5 ciclos sem movimentos de cabeça/corpo.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Head movement</label>
+            <select id="nsuco_pursuits_head"></select>
+          </div>
+          <div>
+            <label title="Head/Body movement: capacidade de realizar 5 ciclos sem movimentos de cabeça/corpo.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Body movement</label>
+            <select id="nsuco_pursuits_body"></select>
+          </div>
+        </div>
+
+        <h3 style="margin:10px 0 6px 0">Saccades</h3>
+        <div class="row row3">
+          <div>
+            <label title="Ability: capacidade de realizar 5 ciclos de alternância de fixação entre dois estímulos.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Ability</label>
+            <select id="nsuco_saccades_ability"></select>
+          </div>
+          <div>
+            <label title="Accuracy: capacidade de realizar 5 ciclos sem refixações corretivas.\n1=hiper/hipometria significativa; 2=grande a moderada; 3=leve porém constante; 4=leve porém intermitente; 5=sem refixações corretivas.">Accuracy</label>
+            <select id="nsuco_saccades_accuracy"></select>
+          </div>
+          <div>
+            <label title="Head/Body movement: capacidade de realizar 5 ciclos sem movimentos de cabeça/corpo.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Head movement</label>
+            <select id="nsuco_saccades_head"></select>
+          </div>
+          <div>
+            <label title="Head/Body movement: capacidade de realizar 5 ciclos sem movimentos de cabeça/corpo.\n1=1 ciclo ou nenhuma capacidade; 2=2 ciclos; 3=3 ciclos; 4=4 ciclos; 5=5 ciclos.">Body movement</label>
+            <select id="nsuco_saccades_body"></select>
+          </div>
+        </div>
+
+        <h3 style="margin:10px 0 6px 0">Observações</h3>
+
+        <div class="row row2">
+          <div>
+            <label>Notas</label>
+            <input id="nsuco_notes" placeholder="Opcional"/>
+          </div>
+          <div class="btnRow" style="align-items:end">
+            <button id="btn_nsuco_salvar">Salvar no paciente</button>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="out" id="nsuco_out"></div>
+          <div>
+            <canvas id="nsuco_chart" width="800" height="320"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+    <div id="tab_binocular" class="tab">
+      <div class="card">
+        <h2>Vergência &amp; Acomodação <span id="bin_progress" class="progress-badge progress-partial">0% preenchido</span></h2>
+        <div class="muted">Preencha os campos e veja comparação com normas em tempo real.</div>
+      </div>
+
+      <div class="card">
+        <h2>🔍 Cover Test / Forias</h2>
+        <div class="row row3">
+          <div class="field-validated">
+            <label>Foria Longe (Δ) — exo + / eso −</label>
+            <select id="bin_cover_distance" onchange="validateBinocularField('bin_cover_distance')"></select>
+            <span id="bin_cover_distance_hint" class="hint"></span>
+          </div>
+          <div class="field-validated">
+            <label>Foria Perto (Δ) — exo + / eso −</label>
+            <select id="bin_cover_near" onchange="validateBinocularField('bin_cover_near')"></select>
+            <span id="bin_cover_near_hint" class="hint"></span>
+          </div>
+          <div>
+            <label>Relação AC/A</label>
+            <select id="bin_aca_ratio"></select>
+          </div>
+        </div>
+
+        <div class="row row3">
+          <div>
+            <label>DP (mm)</label>
+            <input id="bin_pd_mm" type="number" inputmode="decimal" min="40" max="80" step="0.5" placeholder="ex.: 60" onchange="updateAcaCalculated()"/>
+          </div>
+          <div>
+            <label>Distância de trabalho (cm)</label>
+            <input id="bin_work_cm" type="number" inputmode="decimal" min="20" max="100" step="0.5" placeholder="ex.: 40" onchange="updateAcaCalculated()"/>
+          </div>
+          <div>
+            <label>AC/A calculada (heteroforia)</label>
+            <input id="bin_aca_calc" type="text" readonly placeholder="—"/>
+          </div>
+        </div>
+
+        <div class="muted small" style="margin-top:6px">
+          <strong>Convenção de sinal:</strong> na fórmula clínica <span class="mono">eso = +</span> e <span class="mono">exo = −</span>. No app (menus), <span class="mono">exo = +</span> e <span class="mono">eso = −</span> — o sistema converte automaticamente para calcular.
+          <div style="margin-top:4px">
+            <span class="mono">AC/A (calculada) = IPD(cm) + NFD(m) × (Hn − Hf)</span>
+          </div>
+        </div>
+
+        <div class="row row2" style="margin-top:10px">
+          <div class="field-validated">
+            <label>Foria perto com −1.00 D (Δ) — exo + / eso −</label>
+            <select id="bin_grad_near_m1" onchange="updateAllACA()"></select>
+            <span id="bin_grad_near_m1_hint" class="hint"></span>
+          </div>
+          <div class="field-validated">
+            <label>Foria perto com −2.00 D (Δ) — exo + / eso −</label>
+            <select id="bin_grad_near_m2" onchange="updateAllACA()"></select>
+            <span id="bin_grad_near_m2_hint" class="hint"></span>
+          </div>
+        </div>
+
+        <div class="row row2" style="margin-top:8px">
+          <div>
+            <label>AC/A gradiente (−1.00)</label>
+            <input id="bin_aca_grad_m1" type="text" readonly placeholder="—"/>
+          </div>
+          <div>
+            <label>AC/A gradiente (−2.00)</label>
+            <input id="bin_aca_grad_m2" type="text" readonly placeholder="—"/>
+          </div>
+        </div>
+
+
+        <div class="row row2" style="margin-top:10px">
+          <div>
+            <label>Foria lateral Longe (Δ)</label>
+            <select id="bin_cover_distance_lateral"></select>
+          </div>
+          <div>
+            <label>Foria lateral Perto (Δ)</label>
+            <select id="bin_cover_near_lateral"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>↔️ Vergência Suave (Reservas Fusionais)</h2>
+        <h3 style="margin:10px 0 6px 0;font-size:14px">Base Out (Divergência)</h3>
+        <div class="row row3">
+          <div class="field-validated">
+            <label>BO Longe — Embaçamento (Δ)</label>
+            <select id="bin_bo_d_blur"></select>
+          </div>
+          <div class="field-validated">
+            <label>BO Longe — Ruptura (Δ)</label>
+            <select id="bin_bo_d_break"></select>
+          </div>
+          <div>
+            <label>BO Longe — Recuperação (Δ)</label>
+            <select id="bin_bo_d_recovery"></select>
+          </div>
+        </div>
+        <div class="row row3">
+          <div class="field-validated">
+            <label>BO Perto — Embaçamento (Δ)</label>
+            <select id="bin_bo_n_blur"></select>
+          </div>
+          <div class="field-validated">
+            <label>BO Perto — Ruptura (Δ)</label>
+            <select id="bin_bo_n_break" onchange="validateBinocularField('bin_bo_n_break')"></select>
+            <span id="bin_bo_n_break_hint" class="hint"></span>
+          </div>
+          <div>
+            <label>BO Perto — Recuperação (Δ)</label>
+            <select id="bin_bo_n_recovery"></select>
+          </div>
+        </div>
+
+        <h3 style="margin:10px 0 6px 0;font-size:14px">Base In (Convergência)</h3>
+        <div class="row row3">
+          <div>
+            <label>BI Longe — Ruptura (Δ)</label>
+            <select id="bin_bi_d_break"></select>
+          </div>
+          <div>
+            <label>BI Longe — Recuperação (Δ)</label>
+            <select id="bin_bi_d_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+        <div class="row row3">
+          <div>
+            <label>BI Perto — Embaçamento (Δ)</label>
+            <select id="bin_bi_n_blur"></select>
+          </div>
+          <div>
+            <label>BI Perto — Ruptura (Δ)</label>
+            <select id="bin_bi_n_break"></select>
+          </div>
+          <div>
+            <label>BI Perto — Recuperação (Δ)</label>
+            <select id="bin_bi_n_recovery"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⏭️ Vergência Step</h2>
+        <div class="muted small">Preencha os campos conforme a idade do paciente (Crianças 7–12 ou Adultos).</div>
+        
+        <h3 style="margin:10px 0 6px 0;font-size:14px">Criança (7–12 anos)</h3>
+        <div class="row row3">
+          <div>
+            <label>BO Perto — Ruptura (Δ)</label>
+            <select id="bin_step_child_bo_n_break"></select>
+          </div>
+          <div>
+            <label>BO Perto — Recuperação (Δ)</label>
+            <select id="bin_step_child_bo_n_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+        <div class="row row3">
+          <div>
+            <label>BI Perto — Ruptura (Δ)</label>
+            <select id="bin_step_child_bi_n_break"></select>
+          </div>
+          <div>
+            <label>BI Perto — Recuperação (Δ)</label>
+            <select id="bin_step_child_bi_n_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+
+        <h3 style="margin:14px 0 6px 0;font-size:14px">Adulto (≥13 anos)</h3>
+        <div class="row row3">
+          <div>
+            <label>BO Longe — Ruptura (Δ)</label>
+            <select id="bin_step_adult_bo_d_break"></select>
+          </div>
+          <div>
+            <label>BO Longe — Recuperação (Δ)</label>
+            <select id="bin_step_adult_bo_d_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+        <div class="row row3">
+          <div>
+            <label>BI Longe — Ruptura (Δ)</label>
+            <select id="bin_step_adult_bi_d_break"></select>
+          </div>
+          <div>
+            <label>BI Longe — Recuperação (Δ)</label>
+            <select id="bin_step_adult_bi_d_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+        <div class="row row3">
+          <div>
+            <label>BO Perto — Ruptura (Δ)</label>
+            <select id="bin_step_adult_bo_n_break"></select>
+          </div>
+          <div>
+            <label>BO Perto — Recuperação (Δ)</label>
+            <select id="bin_step_adult_bo_n_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+        <div class="row row3">
+          <div>
+            <label>BI Perto — Ruptura (Δ)</label>
+            <select id="bin_step_adult_bi_n_break"></select>
+          </div>
+          <div>
+            <label>BI Perto — Recuperação (Δ)</label>
+            <select id="bin_step_adult_bi_n_recovery"></select>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔄 Flexibilidade Vergencial</h2>
+        <div class="row row2">
+          <div>
+            <label>Perto — 12BO/3BI (cpm)</label>
+            <select id="bin_vf_near_cpm"></select>
+          </div>
+          <div>
+            <label>Longe — 12BO/3BI (cpm)</label>
+            <select id="bin_vf_distance_cpm"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📍 Ponto Próximo de Convergência (PPC)</h2>
+        <div class="row row2">
+          <div class="field-validated">
+            <label>Alvo acomodativo — Ruptura (cm)</label>
+            <select id="bin_npc_break" onchange="validateBinocularField('bin_npc_break')"></select>
+            <span id="bin_npc_break_hint" class="hint"></span>
+          </div>
+          <div>
+            <label>Alvo acomodativo — Recuperação (cm)</label>
+            <select id="bin_npc_recovery"></select>
+          </div>
+        </div>
+        <div class="row row2">
+          <div>
+            <label>Caneta + V/V — Ruptura (cm)</label>
+            <select id="bin_npc_rg_break"></select>
+          </div>
+          <div>
+            <label>Caneta + V/V — Recuperação (cm)</label>
+            <select id="bin_npc_rg_recovery"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔬 Amplitude Acomodativa</h2>
+        <div class="row row2">
+          <div class="field-validated">
+            <label>AA — Push-up (D)</label>
+            <select id="bin_aa" onchange="validateBinocularField('bin_aa')"></select>
+            <span id="bin_aa_hint" class="hint"></span>
+          </div>
+          <div>
+            <label>AA — Minus lens (D)</label>
+            <select id="bin_aa_minus"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⚡ Flexibilidade Acomodativa</h2>
+        <div class="row row2">
+          <div>
+            <label>MAF — Monocular (cpm)</label>
+            <select id="bin_maf"></select>
+          </div>
+          <div>
+            <label>BAF — Binocular (cpm)</label>
+            <select id="bin_af"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>➕ Testes Complementares de Acomodação</h2>
+        <div class="row row2">
+          <div>
+            <label>MEM — Retinoscopia estimativa (D)</label>
+            <select id="bin_mem"></select>
+          </div>
+          <div>
+            <label>FCC — Cilindro cruzado fundido (D)</label>
+            <select id="bin_fcc"></select>
+          </div>
+        </div>
+        <div class="row row2">
+          <div>
+            <label>NRA — Acomodação relativa negativa (D)</label>
+            <select id="bin_nra"></select>
+          </div>
+          <div>
+            <label>PRA — Acomodação relativa positiva (D)</label>
+            <select id="bin_pra"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="btnRow">
+          <button id="btn_binocular_salvar">Salvar no paciente</button>
+          <button id="btn_binocular_copy_whatsapp" class="secondary">📋 Copiar p/ WhatsApp</button>
+          <button id="btn_binocular_ver_json" class="secondary">Ver JSON</button>
+        </div>
+      </div>
+
+      <div id="bin_out"></div>
+    </div>
+
+    <div id="tab_visao_binocular" class="tab">
+      <div class="card">
+        <h2>Visão binocular — Worth 4 Dot + Estereopsia</h2>
+        <div class="muted">Registro clínico + referências (não inventa valores; regras simples quando aplicável).</div>
+
+        <div style="margin-top:10px;font-weight:600">Worth 4 Dot</div>
+        <div class="row row2">
+          <div>
+            <label>Distância (≈ 6 m)</label>
+            <select id="bnv_w4d_distance"></select>
+          </div>
+          <div>
+            <label>Perto (≈ 40 cm)</label>
+            <select id="bnv_w4d_near"></select>
+          </div>
+        </div>
+        <label>Observações (Worth)</label>
+        <textarea id="bnv_w4d_notes" placeholder="Ex.: alternância, variação, sintomas..."></textarea>
+
+        <div style="margin-top:10px;font-weight:600">Estereopsia</div>
+        <div class="row row3">
+          <div>
+            <label>Titmus Fly (grosseira)</label>
+            <select id="bnv_titmus_fly"></select>
+          </div>
+          <div>
+            <label>Titmus — círculos (arcseg)</label>
+            <select id="bnv_titmus_circles"></select>
+          </div>
+          <div>
+            <label>Dot 2 (arcseg)</label>
+            <input id="bnv_dot2" type="number" inputmode="decimal" min="0" max="10000" step="1" list="stereo_arcsec_list" placeholder="Ex.: 200"/>
+            <datalist id="stereo_arcsec_list">
+              <option value="40"></option>
+              <option value="50"></option>
+              <option value="60"></option>
+              <option value="80"></option>
+              <option value="100"></option>
+              <option value="140"></option>
+              <option value="200"></option>
+              <option value="400"></option>
+              <option value="800"></option>
+              <option value="1000"></option>
+              <option value="2000"></option>
+              <option value="3000"></option>
+            </datalist>
+          </div>
+        </div>
+        <div class="row row2" style="margin-top:10px">
+          <div>
+            <label>Estabilidade de fixação (segundos)</label>
+            <input id="bnv_fix_seconds" type="number" inputmode="numeric" min="0" max="120" step="1" placeholder="ex.: 10"/>
+          </div>
+          <div class="muted small" style="align-self:end">
+            Referência: manter fixação precisa por <b>10 s</b>.
+          </div>
+        </div>
+
+        <label>Observações (Estereopsia)</label>
+        <textarea id="bnv_stereo_notes" placeholder="Ex.: respostas inconsistentes, supressão, pistas monoculares..."></textarea>
+
+        <div class="btnRow">
+          <button id="btn_bnv_salvar">Salvar no paciente</button>
+          <button id="btn_bnv_limpar" class="secondary">Limpar</button>
+        </div>
+
+        <div style="margin-top:12px" class="out" id="bnv_out"></div>
+      </div>
+    </div>
+
+    <div id="tab_painel" class="tab">
+      <div class="dash-shell">
+        <div class="dash-topbar">
+          <div>
+            <h2 class="dash-title">Painel integrado</h2>
+            <div class="dash-sub">Resumo e indicadores do paciente selecionado.</div>
+          </div>
+          <div class="dash-actions">
+            <button id="btn_panel_refresh" class="btn-primary">Atualizar painel</button>
+            <button id="btn_panel_copy" class="btn">Copiar</button>
+          </div>
+        </div>
+
+        <div class="dash-cards">
+          <div class="dash-card grad-pink">
+            <div class="dash-card-k">TVPS-4</div>
+            <div class="dash-card-v" id="dash_tvps_v">—</div>
+            <div class="dash-card-s" id="dash_tvps_s">SS / Percentil total</div>
+          </div>
+
+          <div class="dash-card grad-purple">
+            <div class="dash-card-k">NSUCO</div>
+            <div class="dash-card-v" id="dash_nsuco_v">—</div>
+            <div class="dash-card-s" id="dash_nsuco_s">Pursuits / Saccades</div>
+          </div>
+
+          <div class="dash-card grad-blue">
+            <div class="dash-card-k">Vergência</div>
+            <div class="dash-card-v" id="dash_bin_v">—</div>
+            <div class="dash-card-s" id="dash_bin_s">Forias / PPC</div>
+          </div>
+
+          <div class="dash-card grad-orange">
+            <div class="dash-card-k">Visão binocular</div>
+            <div class="dash-card-v" id="dash_bnv_v">—</div>
+            <div class="dash-card-s" id="dash_bnv_s">Worth / Estereopsia</div>
+          </div>
+          <div class="dash-card grad-green">
+            <div class="dash-card-k">DTVP-3</div>
+            <div class="dash-card-v" id="dash_dtvp_v">—</div>
+            <div class="dash-card-s" id="dash_dtvp_s">PVG / IVM / PVRM</div>
+          </div>
+
+          <div class="dash-card grad-slate">
+            <div class="dash-card-k">DEM</div>
+            <div class="dash-card-v" id="dash_dem_v">—</div>
+            <div class="dash-card-s" id="dash_dem_s">Ratio / Percentil</div>
+          </div>
+
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-panel">
+            <div class="dash-panel-head">
+              <div class="dash-panel-title">NSUCO — Radar</div>
+              <div class="dash-panel-sub" id="dash_nsuco_meta">Pursuits × Saccades • Alvo 4</div>
+            </div>
+            <canvas id="panel_nsuco_radar" width="720" height="380"></canvas>
+          </div>
+
+          <div class="dash-panel">
+            <div class="dash-panel-head">
+              <div class="dash-panel-title">TVPS-4 — Perfil (Scaled)</div>
+              <div class="dash-panel-sub">7 subtestes • escala 1–19</div>
+            </div>
+            <canvas id="panel_tvps_chart" width="720" height="320"></canvas>
+          </div>
+
+          <div class="dash-panel">
+            <div class="dash-panel-head">
+              <div class="dash-panel-title">DTVP-3 — Perfil (Scaled)</div>
+              <div class="dash-panel-sub">5 subtestes • escala 1–19</div>
+            </div>
+            <canvas id="panel_dtvp_chart" width="720" height="320"></canvas>
+          </div>
+
+          <div class="dash-panel">
+            <div class="dash-panel-head">
+              <div class="dash-panel-title">Resumo estruturado (para copiar)</div>
+              <div class="dash-panel-sub">Clique em <b>Copiar</b> para enviar à equipe.</div>
+            </div>
+            <div class="out" id="panel_integrado"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="tab_selftest" class="tab">
+      <div class="card">
+        <h2>Self-Test (integridade do app)</h2>
+        <div class="muted">
+          Executa verificações locais (sem internet) para detectar falhas comuns: IDs ausentes, selects vazios, normas carregadas e gravação/leitura da aba Vergência &amp; Acomodação.
+        </div>
+        <div class="btnRow" style="margin-top:10px">
+          <button id="btn_selftest_run">Executar Self-Test</button>
+        </div>
+        <div class="out" id="selftest_out" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="fatal" style="display:none" class="card"></div>
+<div id="toast" class="toast"></div>
+
+<!-- Netlify Identity (login) para sync multi-dispositivo -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+<!-- NORMS FIRST -->
+<script src="tvps4_norms.js"></script>
+<script src="dtvp3_norms.js"></script>
+<script src="dem_norms.js"></script>
+<script src="binocular_norms.js"></script>
+<script src="nsuco_norms.js"></script>
+
+<!-- ENGINE + UI -->
+<script src="clinicalEngine.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
