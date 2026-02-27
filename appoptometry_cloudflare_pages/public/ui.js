@@ -388,6 +388,14 @@
       btn.addEventListener('click', ()=> selectPatient(p.id));
       box.appendChild(btn);
     });
+    // --- COMPAT: evita crash se algum trecho chama renderPatientList() ---
+function renderPatientList(){
+  if (typeof renderPatients === 'function') return renderPatients();
+  if (typeof renderPatientTable === 'function') return renderPatientTable();
+  if (typeof renderList === 'function') return renderList();
+
+  console.error('Nenhuma função de render encontrada (renderPatients/renderPatientTable/renderList).');
+}
   }
 
   // ---------------- Panel Markup Guards ----------------
