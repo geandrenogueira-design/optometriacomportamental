@@ -2759,8 +2759,6 @@ function renderPatientList(){
     setSyncStatus('Falhou', false);
     try{ showToast('Falha ao baixar: ' + msg, false); }catch(_){}
   }
-}
-
   async function syncPush(){
     const key = getSyncKey();
     if(!key){ setSyncStatus('Informe a chave', false); return; }
@@ -2783,7 +2781,6 @@ function renderPatientList(){
       setSyncStatus('Falhou', false);
       try{ showToast('Falha ao enviar: '+(e.message||e), false); }catch(_){}
     }
-  }
 
   function wireSyncUI(){
     const keyEl = el('sync_key');
