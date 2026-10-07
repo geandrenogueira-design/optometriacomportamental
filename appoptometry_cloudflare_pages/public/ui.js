@@ -2320,7 +2320,7 @@ setHTML('panel_integrado', `
     // target
     if(Number.isFinite(targetV)){
       const tgt = new Array(n).fill(targetV);
-      poly(tgt, 'rgba(17,24,39,.55)', null, [6,5]);
+      poly(tgt, chartAxis, null, [6,5]);
     }
 
     // series
@@ -2332,7 +2332,7 @@ setHTML('panel_integrado', `
 
     // legend
     const legend = [];
-    if(Number.isFinite(targetV)) legend.push({label:`Alvo ${targetV}`, color:'rgba(17,24,39,.55)', dash:true});
+    if(Number.isFinite(targetV)) legend.push({label:`Alvo ${targetV}`, color:chartAxis, dash:true});
     (series||[]).forEach((s, idx)=> legend.push({label:s.name||`S${idx+1}`, color:s.color || (idx===0?c1:c2), dash:false}));
     let x0 = 14, y0 = 16;
     ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,Arial';
@@ -2793,7 +2793,7 @@ function showTabById(t){
     rows.push(`<div>Perto: <span class="mono">${escapeHtml(mapWorth[String(d.w4d_near)] || (d.w4d_near??'—'))}</span></div>`);
     if(d.w4d_notes) rows.push(`<div class="muted" style="margin-top:6px">Obs.: ${escapeHtml(d.w4d_notes)}</div>`);
 
-    rows.push('<hr style="border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0">');
+    rows.push('<hr style="margin:10px 0">');
     rows.push('<div style="font-weight:600;margin-bottom:6px">Estereopsia</div>');
     rows.push(`<div>Titmus Fly: <span class="mono">${escapeHtml(mapFly[String(d.titmus_fly)] || (d.titmus_fly??'—'))}</span></div>`);
     rows.push(`<div>Titmus círculos: <span class="mono">${escapeHtml(fmtArc(d.titmus_circles_arcsec))}</span></div>`);

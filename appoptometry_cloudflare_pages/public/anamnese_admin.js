@@ -40,7 +40,7 @@
     try{
       const r = await api('POST', { action: 'create', label, patientId: p ? p.id : null, days: Number($('an_days').value) || 14 });
       const msg = whatsappText(label, r.url, r.expiresAt);
-      $('an_new').innerHTML = `<div class="card" style="background:#f3f8fb">
+      $('an_new').innerHTML = `<div class="card io-newlink">
         <div class="k">Link gerado</div><div class="mono" style="word-break:break-all;margin:4px 0 8px">${esc(r.url)}</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button id="an_copy_link">Copiar link</button>
@@ -191,7 +191,7 @@
     const rows = sc.domains.map((d) => `<tr>
         <td>${esc(d.label)}</td>
         <td class="mono" style="text-align:right">${d.answered ? d.sum + ' / ' + d.max : '—'}<div class="muted" style="font-size:11px">${d.answered} de ${d.items} itens</div></td>
-        <td style="min-width:110px"><div style="background:#e8edf2;border-radius:4px;height:10px"><div style="width:${d.pct || 0}%;height:10px;border-radius:4px;background:#1e2d68"></div></div></td>
+        <td style="min-width:110px"><div class="io-bar"><div style="width:${d.pct || 0}%"></div></div></td>
         <td class="mono" style="text-align:right">${d.pct == null ? '—' : d.pct + '%'}</td>
         <td class="mono" style="text-align:center">${d.high}</td>
         <td class="muted" style="font-size:12px">${esc(d.tests)}</td></tr>`).join('');
@@ -211,7 +211,7 @@
       <div class="muted" style="font-size:12px">Preenchido por ${esc(a.respondente || '—')}${a.parentesco ? ' (' + esc(a.parentesco) + ')' : ''}
         · ${p.anamnese.submittedAt ? 'enviado ' + new Date(p.anamnese.submittedAt).toLocaleDateString('pt-BR') : 'importado de arquivo'}
         · consentimento ${a.consentimento === true ? 'registrado' : '<b>não registrado</b>'}</div>
-      ${sc.flags.length ? `<div class="card" style="background:#fff6ec;border-color:#c4966e;margin-top:10px"><b>Alertas para o perfil</b><ul style="margin:6px 0 0 18px">${sc.flags.map((f) => `<li>${esc(f)}</li>`).join('')}</ul></div>` : ''}
+      ${sc.flags.length ? `<div class="card io-alert" style="margin-top:10px"><b>Alertas para o perfil</b><ul style="margin:6px 0 0 18px">${sc.flags.map((f) => `<li>${esc(f)}</li>`).join('')}</ul></div>` : ''}
       <h3 style="margin-top:14px">Sinais e sintomas por domínio</h3>
       <div class="muted" style="font-size:12px;margin-bottom:6px">Escala 0 (nunca) a 4 (sempre). Pontuação descritiva: este questionário não é validado e não tem ponto de corte. Use para orientar quais testes aprofundar.</div>
       <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px">

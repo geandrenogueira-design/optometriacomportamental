@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sistema de Avaliação Visual (offline) — v4.3.14</title>
+  <title>Optometria comportamental — Instituto Olhar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>try{var t=localStorage.getItem('olhar_theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
   <style>
     /* Tema claro (mais confortável em consultório) */
     :root{
@@ -145,12 +149,111 @@
 .comparison-table th{background:var(--panel2);font-weight:600;font-size:12px}
 .comparison-table .highlight{background:rgba(245,158,11,.12);font-weight:600}
 
+/* =====================================================================
+   IDENTIDADE INSTITUTO OLHAR — camada visual (tema claro e escuro)
+   Paleta: azul institucional #1e2d68 · marrom #8a5f3a / #c4966e · ciano #cde7f1 · cinza #cfd5d9
+   Tipografia: Outfit. Texto em preto profundo no tema claro.
+   ===================================================================== */
+:root, :root[data-theme="light"]{
+  color-scheme: light;
+  --io-navy:#1e2d68; --io-navy2:#2c3f8f; --io-brown:#8a5f3a; --io-sand:#c4966e; --io-cyan:#cde7f1; --io-gray:#cfd5d9;
+  --bg:#f4f6f9; --panel:#ffffff; --panel2:#f3f6fa; --surface:#ffffff;
+  --text:#0a0a0a; --muted:#4f5a70; --line:rgba(30,45,104,.14); --border:rgba(30,45,104,.14);
+  --accent:#1e2d68; --accent2:#3d8fb5; --primary:#1e2d68; --primary2:#2c3f8f;
+  --bad:#b4412f; --ok:#2f7d5b; --warn:#a2681c;
+  --shadow:0 1px 2px rgba(30,45,104,.06), 0 8px 24px rgba(30,45,104,.06);
+  --side:#ffffff; --nav-active:#cde7f1; --nav-active-tx:#1e2d68; --focus:rgba(30,45,104,.18);
+  --chartText:#0a0a0a; --chartAxis:rgba(30,45,104,.55); --chartGrid:rgba(30,45,104,.12);
+  --chart1:#1e2d68; --chart2:#a2734b; --chart3:#3d8fb5; --chart4:#8a5f3a; --chart5:#6b7a99; --chart6:#b4412f;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0c1129; --panel:#141b3b; --panel2:#1a2248; --surface:#141b3b;
+  --text:#eef2f8; --muted:#a8b2c8; --line:rgba(205,231,241,.14); --border:rgba(205,231,241,.14);
+  --accent:#cde7f1; --accent2:#7fc4e0; --primary:#3a4f9e; --primary2:#4a60b4;
+  --bad:#ff8a73; --ok:#6fd3a0; --warn:#f0b56a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.28);
+  --side:#10173a; --nav-active:#25306a; --nav-active-tx:#cde7f1; --focus:rgba(205,231,241,.22);
+  --chartText:#eef2f8; --chartAxis:rgba(205,231,241,.55); --chartGrid:rgba(205,231,241,.12);
+  --chart1:#9fc3e6; --chart2:#e0b48c; --chart3:#7fc4e0; --chart4:#c4966e; --chart5:#b8c2d8; --chart6:#ff8a73;
+}
+body{background:var(--bg);color:var(--text);font:15px/1.5 Outfit,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+aside{background:var(--side);border-right:1px solid var(--line);backdrop-filter:none}
+main{background:transparent}
+h1,h2,.dash-title,.dash-panel-title{color:var(--io-navy);font-weight:600;letter-spacing:.1px}
+:root[data-theme="dark"] h1,:root[data-theme="dark"] h2,:root[data-theme="dark"] .dash-title,:root[data-theme="dark"] .dash-panel-title{color:var(--io-cyan)}
+h2{font-size:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:14px}
+label{color:var(--muted);font-size:12.5px;font-weight:500}
+input,select,textarea{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;font:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)}
+select option{background:var(--surface);color:var(--text)}
+button{font:inherit;font-weight:500;background:var(--io-navy);color:#fff;border:1px solid var(--io-navy);border-radius:12px;transition:background .15s,border-color .15s}
+button:hover{background:var(--io-navy2);border-color:var(--io-navy2)}
+button.secondary,.btn,a.secondary{background:transparent;color:var(--io-navy);border:1px solid var(--line)}
+button.secondary:hover,.btn:hover,a.secondary:hover{background:var(--io-cyan);border-color:var(--io-cyan);color:var(--io-navy)}
+a.secondary{display:inline-block;padding:10px 12px;border-radius:12px;text-decoration:none}
+button.danger{background:transparent;color:var(--bad);border-color:var(--bad)}
+:root[data-theme="dark"] button{background:var(--primary);border-color:var(--primary)}
+:root[data-theme="dark"] button:hover{background:var(--primary2);border-color:var(--primary2)}
+:root[data-theme="dark"] button.secondary,:root[data-theme="dark"] .btn,:root[data-theme="dark"] a.secondary{background:transparent;color:var(--io-cyan);border-color:var(--line)}
+:root[data-theme="dark"] button.secondary:hover,:root[data-theme="dark"] .btn:hover,:root[data-theme="dark"] a.secondary:hover{background:var(--nav-active);color:var(--io-cyan)}
+.btn-primary{background:var(--io-navy);border-color:var(--io-navy);box-shadow:none}
+.nav button{background:transparent;color:var(--text);border:1px solid transparent;font-weight:500}
+.nav button:hover{background:var(--panel2);border-color:var(--line);color:var(--text)}
+.nav button.active{background:var(--nav-active);border-color:transparent;color:var(--nav-active-tx);font-weight:600;box-shadow:inset 3px 0 0 var(--io-sand)}
+.pill{background:var(--panel2);border-color:var(--line);color:var(--muted)}
+.out{background:var(--panel2);border-color:var(--line)}
+canvas{background:var(--surface);border-color:var(--line)}
+#panel_nsuco_radar{background:var(--surface);border-color:var(--line)}
+.list{border-color:var(--line)}
+.list button,.patient-item{background:transparent;color:var(--text);border-color:var(--line)}
+.list button:hover,.patient-item:hover{background:var(--panel2)}
+.patient-item.active{background:var(--nav-active);color:var(--nav-active-tx)}
+.toast{background:var(--surface);color:var(--text);border-color:var(--line);box-shadow:var(--shadow)}
+.dash-panel{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+.dash-card{box-shadow:0 10px 22px rgba(30,45,104,.16)}
+.grad-pink{background:linear-gradient(135deg,#1e2d68 0%,#33489a 100%)}
+.grad-purple{background:linear-gradient(135deg,#27367a 0%,#4a5fae 100%)}
+.grad-blue{background:linear-gradient(135deg,#1e2d68 0%,#2f7fa8 100%)}
+.grad-orange{background:linear-gradient(135deg,#6f4a2b 0%,#a87b52 100%)}
+.grad-green{background:linear-gradient(135deg,#235a75 0%,#3d8fb5 100%)}
+.grad-slate{background:linear-gradient(135deg,#2b3247 0%,#1e2d68 100%)}
+.summary-card{border-left-color:var(--accent);background:var(--panel2)}
+.comparison-table th{background:var(--panel2);color:var(--text)}
+.hint.info{color:var(--accent2)}
+.progress-partial{color:var(--warn)}
+hr{border:none;border-top:1px solid var(--line)}
+/* Cabeçalho da marca e alternância de tema */
+.io-brand{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+.io-brand .io-mark{width:30px;height:30px;border-radius:50%;border:5px solid var(--io-navy);border-right-color:transparent;transform:rotate(-45deg);flex:none}
+:root[data-theme="dark"] .io-brand .io-mark{border-color:var(--io-cyan);border-right-color:transparent}
+.io-brand b{display:block;letter-spacing:.16em;font-size:13.5px;font-weight:700;color:var(--io-navy)}
+:root[data-theme="dark"] .io-brand b{color:var(--io-cyan)}
+.io-brand span{display:block;font-size:12px;color:var(--io-brown)}
+:root[data-theme="dark"] .io-brand span{color:var(--io-sand)}
+.io-brand .io-theme{margin-left:auto;width:34px;height:34px;padding:0;border-radius:50%;background:transparent;color:var(--muted);border:1px solid var(--line);font-size:15px;line-height:1}
+.io-brand .io-theme:hover{background:var(--panel2);color:var(--text)}
+:root[data-theme="dark"] .nav button,:root[data-theme="dark"] .list button,:root[data-theme="dark"] .patient-item,:root[data-theme="dark"] .io-brand .io-theme{background:transparent;color:var(--text);border-color:transparent}
+:root[data-theme="dark"] .io-brand .io-theme{border-color:var(--line);color:var(--muted)}
+:root[data-theme="dark"] .nav button:hover,:root[data-theme="dark"] .list button:hover,:root[data-theme="dark"] .patient-item:hover,:root[data-theme="dark"] .io-brand .io-theme:hover{background:var(--panel2);border-color:var(--line)}
+:root[data-theme="dark"] .nav button.active,:root[data-theme="dark"] .patient-item.active{background:var(--nav-active);color:var(--nav-active-tx);border-color:transparent}
+.patient-item{display:block;width:100%;text-align:left;padding:10px 12px}
+.patient-item .pname{font-weight:600}
+.patient-item .psub{font-size:12.5px;color:var(--muted)}
+.patient-item.active .psub{color:inherit;opacity:.8}
+/* Barras e caixas da aba Anamnese */
+.io-bar{background:var(--panel2);border-radius:4px;height:10px}
+.io-bar > div{height:10px;border-radius:4px;background:var(--chart1)}
+.io-newlink{background:var(--panel2)}
+.io-alert{background:rgba(196,150,110,.12);border-color:var(--io-sand)}
+
 </style>
 </head>
 <body>
 <div class="app">
   <aside>
-    <h1>Sistema — offline (bundle)</h1>
+    <div class="io-brand"><div class="io-mark" aria-hidden="true"></div><div><b>INSTITUTO OLHAR</b><span>Optometria comportamental</span></div><button type="button" class="io-theme" id="io_theme" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">◐</button></div>
     <div class="pill">Paciente selecionado: <span id="selected_patient">nenhum</span></div>
 
     <div class="nav">
@@ -165,14 +268,6 @@
       <button data-tab="tab_visao_binocular">🧿 Visão binocular</button>
       <button data-tab="tab_painel">📊 Painel integrado</button>
       <button data-tab="tab_selftest">🧪 Self-Test</button>
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <div class="muted" style="font-size:12px;margin-bottom:6px">Dica</div>
-      <div class="muted" style="font-size:12px">
-        Rode em servidor local para evitar limitações de <code>file://</code>.
-        Ex.: <code>python -m http.server 8000</code> e abra <code>http://localhost:8000</code>.
-      </div>
     </div>
   </aside>
 
@@ -1002,5 +1097,27 @@
 <script src="ui.js"></script>
 <script src="anamnese/schema.js"></script>
 <script src="anamnese_admin.js"></script>
+<script>
+// Alternância de tema (claro/escuro), lembrada neste aparelho
+(function(){
+  var KEY='olhar_theme';
+  function apply(t){
+    document.documentElement.setAttribute('data-theme', t);
+    try{ localStorage.setItem(KEY, t); }catch(e){}
+    // redesenha os gráficos com as cores do tema
+    var tab=document.getElementById('tab_painel');
+    var btn=document.getElementById('btn_panel_refresh');
+    if(tab && btn && tab.classList.contains('active')) btn.click();
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var b=document.getElementById('io_theme');
+    if(!b) return;
+    b.addEventListener('click', function(){
+      var cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+      apply(cur==='dark'?'light':'dark');
+    });
+  });
+})();
+</script>
 </body>
 </html>
