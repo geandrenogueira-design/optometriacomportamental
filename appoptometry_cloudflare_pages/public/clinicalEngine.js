@@ -62,13 +62,6 @@
     return null;
   }
 
-  function ageToKeyDTVP(y, m){
-    // DTVP3 norms file uses "4-0_a_4-5" style keys
-    if(y < 4) return null;
-    const half = (m <= 5) ? '0_a_5' : '6_a_11';
-    return `${y}-${half.replace('_a_', '-').replace('0_a_5','0_a_5')}`; // placeholder (we map below)
-  }
-
   function findDTVPAgeKey(y, m){
     // match actual keys in DTVP3_NORMS.tabelas_conversao
     const keys = Object.keys(window.DTVP3_NORMS?.tabelas_conversao || {});
@@ -217,12 +210,9 @@
 
   function demAgeKey(y, m){
     // dem norms keys like "6.0-6.11"
-    const a = y + (m/12);
-    if(a < 6) return null;
-    // choose integer year bracket
-    const yInt = y;
-    if(yInt >= 13) return '13.0-13.11';
-    return `${yInt}.0-${yInt}.11`;
+    // Normas publicadas: 6a0m a 13a11m. Fora disso não há referência — não extrapolar.
+    if(!Number.isFinite(y) || y < 6 || y > 13) return null;
+    return `${y}.0-${y}.11`;
   }
 
   function demZ(ageKey, metric, value){

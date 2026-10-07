@@ -156,6 +156,7 @@
     <div class="nav">
       <button data-tab="tab_pacientes">📁 Pacientes</button>
       <button data-tab="tab_perfil">🧾 Perfil / Questionário</button>
+      <button data-tab="tab_anamnese">📝 Anamnese (pais)</button>
       <button data-tab="tab_tvps">👁️ TVPS-4</button>
       <button data-tab="tab_dem">📚 DEM</button>
       <button data-tab="tab_dtvp">✍️ DTVP-3</button>
@@ -220,31 +221,6 @@
         <h2>Lista de pacientes</h2>
         <div id="patient_list" class="list"></div>
       </div>
-
-      <div class="card" id="sync_card">
-        <h2>Sincronização (Cloudflare)</h2>
-        <p class="muted" style="margin-top:6px">
-          Use a mesma <b>Chave de Sync</b> em todos os dispositivos para compartilhar os dados.
-        </p>
-        <div class="grid2">
-          <div class="field">
-            <label>Chave de Sync</label>
-            <input id="sync_key" placeholder="ex.: geandre-001 (guarde essa chave)"/>
-          </div>
-          <div class="field">
-            <label>Status</label>
-            <div id="sync_status" class="pill">Desconectado</div>
-          </div>
-        </div>
-        <div class="btnRow">
-          <button id="btn_sync_pull" class="secondary">Baixar da nuvem</button>
-          <button id="btn_sync_push">Enviar para a nuvem</button>
-        </div>
-        <p class="muted" style="margin-top:8px">
-          Dica: faça <b>Baixar</b> no primeiro uso em um novo aparelho, depois use <b>Enviar</b> após salvar/atualizar pacientes.
-        </p>
-      </div>
-
     </div>
 
     <div id="tab_perfil" class="tab">
@@ -965,6 +941,35 @@
     </div>
 
 
+    <div id="tab_anamnese" class="tab">
+      <div class="card">
+        <h2>Anamnese preenchida pelos pais</h2>
+        <div class="muted">Gere um link, envie aos pais pelo WhatsApp e, quando eles responderem, importe as respostas para o paciente.</div>
+        <div id="an_cloud" style="margin-top:12px">
+          <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+            <label style="flex:1;min-width:200px">Nome da criança<input id="an_label" placeholder="Nome completo"/></label>
+            <label style="width:130px">Validade (dias)<input id="an_days" type="number" min="1" max="60" value="14"/></label>
+            <button id="an_create">Gerar link</button>
+          </div>
+          <div class="muted" style="font-size:12px;margin-top:6px">Se houver um paciente selecionado, o link fica vinculado a ele.</div>
+          <div id="an_new" style="margin-top:10px"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+            <h2 style="margin:0">Links</h2><button class="secondary" id="an_refresh">Atualizar lista</button>
+          </div>
+          <div id="an_list" style="margin-top:8px"><div class="muted">—</div></div>
+        </div>
+        <div id="an_local" class="muted" style="display:none;margin-top:12px">Modo local: a lista de links só funciona no app publicado. Use “Importar arquivo”.</div>
+        <div style="margin-top:14px">
+          <button class="secondary" id="an_file_btn">Importar arquivo de respostas (.json)</button>
+          <input type="file" id="an_file" accept="application/json,.json" style="display:none">
+        </div>
+      </div>
+      <div class="card">
+        <h2>Resumo do paciente selecionado</h2>
+        <div id="an_summary"><div class="muted">Selecione um paciente com anamnese importada.</div></div>
+      </div>
+    </div>
+
     <div id="tab_selftest" class="tab">
       <div class="card">
         <h2>Self-Test (integridade do app)</h2>
@@ -984,6 +989,7 @@
 <div id="fatal" style="display:none" class="card"></div>
 <div id="toast" class="toast"></div>
 
+
 <!-- NORMS FIRST -->
 <script src="tvps4_norms.js"></script>
 <script src="dtvp3_norms.js"></script>
@@ -994,5 +1000,7 @@
 <!-- ENGINE + UI -->
 <script src="clinicalEngine.js"></script>
 <script src="ui.js"></script>
+<script src="anamnese/schema.js"></script>
+<script src="anamnese_admin.js"></script>
 </body>
 </html>
