@@ -7,12 +7,14 @@ App clínico de optometria comportamental: TVPS-4, DTVP-3, DEM, NSUCO, vergênci
 - **Dados na nuvem:** banco D1, uma linha por paciente, com histórico diário guardado por 30 dias.
 - **Offline:** tudo fica salvo no navegador (localStorage) e sincroniza quando há internet.
 - **Backup manual:** botões **Exportar JSON** e **Importar JSON** no menu lateral.
+- **Fluxo por etapas:** menu organizado pelo protocolo (Paciente → Entrada → Processamento central → Saída → Resultado), barra do paciente com idade e progresso, salvamento automático, botões −/+ nas listas numéricas, "não testado / não colaborou" por bloco, aba de acuidade e refração, relatório para imprimir ou salvar em PDF e menu em gaveta no celular (`public/ux.js`).
 - **Anamnese pelos pais:** formulário público em `/anamnese/?c=CÓDIGO`. Os pais preenchem pelo celular e o clínico importa as respostas na aba **Anamnese (pais)**.
 
 ```
 public/                     app estático (index.html, ui.js, clinicalEngine.js, normas)
 public/anamnese/            formulário dos pais (index.html) e definição das perguntas (schema.js)
 public/anamnese_admin.js    aba "Anamnese (pais)" do app
+public/ux.js                fluxo por etapas, salvamento automático, relatório e navegação
 functions/api/auth/         login: status, setup (primeira conta), login, logout
 functions/api/user-data.js  sincronização dos pacientes (exige login)
 functions/api/migrate-kv.js migração única do KV da versão anterior (protegida, só leitura)
