@@ -121,7 +121,7 @@
           <button id="btn_export_json" class="secondary">Exportar JSON</button>
           <button id="btn_import_json" class="secondary">Importar JSON</button>
           <button id="btn_migrate_kv" class="secondary" style="display:none">Trazer dados da versão anterior</button>
-          <a id="btn_logout" class="secondary" href="/cdn-cgi/access/logout" style="display:none">Sair</a>
+          <button id="btn_logout" class="secondary" style="display:none">Sair</button>
         </div>
         <input type="file" id="import_json_file" accept="application/json,.json" style="display:none">
         <div class="pill" style="margin-top:10px">Status: <span id="sync_status">—</span></div>
@@ -163,7 +163,8 @@
   function handleSyncError(e, label){
     if(e && e.session){
       identityReady = false;
-      setSyncStatus('sessão expirada — recarregue a página');
+      setSyncStatus('sessão expirada — entre de novo');
+      showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
       return;
     }
     console.warn(label + ' failed', e);
@@ -172,14 +173,15 @@
 
   async function syncPull(opts){
     const force = !!(opts && opts.force);
-    if(isLocalOnly()) return;
+    if(isLocalOnly() || !identityReady) return;
     if(!isOnline()) { setSyncStatus('sem internet (dados salvos neste aparelho)'); return; }
     setSyncStatus('baixando…');
     try{
       const { res, data: remote } = await apiFetch('GET');
       if(res.status === 401 || res.status === 403){
         identityReady = false;
-        setSyncStatus('não autenticado — recarregue a página');
+        setSyncStatus('não autenticado — entre de novo');
+        showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
         return;
       }
       if(!res.ok || !remote){
@@ -235,7 +237,8 @@
       }
       if(res.status === 401 || res.status === 403){
         identityReady = false;
-        setSyncStatus('não autenticado — recarregue a página');
+        setSyncStatus('não autenticado — entre de novo');
+        showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
         return;
       }
       if(!res.ok){
@@ -311,7 +314,8 @@
     try{
       const res = await fetch('/api/migrate-kv?key=' + encodeURIComponent(key), { credentials: 'same-origin', cache: 'no-store', headers: { 'Accept': 'application/json' } });
       const ctype = res.headers.get('Content-Type') || '';
-      if(res.redirected || !ctype.includes('application/json')) throw new Error('Sessão expirada: recarregue a página.');
+      if(!ctype.includes('application/json')) throw new Error('Resposta inesperada do servidor.');
+      if(res.status === 401){ showLogin('Sua sessão expirou. Entre de novo.'); throw new Error('Entre de novo para continuar.'); }
       const data = await res.json();
       if(!res.ok) throw new Error(data.error || ('Erro ' + res.status));
       const have = new Set(state.patients.map(p=>p.id));
@@ -349,8 +353,121 @@
       await syncPull();
       if(identityReady) await syncPush();
     });
-    window.addEventListener('online', ()=> syncPull());
+    window.addEventListener('online', ()=>{ if(identityReady) syncPull(); });
+    const btnOut = document.getElementById('btn_logout');
+    if(btnOut) btnOut.addEventListener('click', async ()=>{
+      if(!window.confirm('Sair da conta neste aparelho? Os dados já sincronizados continuam na nuvem.')) return;
+      try{ await fetch('/api/auth/logout', { method:'POST', credentials:'same-origin' }); }catch(_){ }
+      location.reload();
+    });
+    checkAuth();
+  }
+
+  // ---------------- Login próprio (tela de entrada) ----------------
+  // O app só abre depois do login. Sem internet, dá para continuar com os dados deste aparelho.
+  function authOverlay(){
+    let ov = document.getElementById('auth_overlay');
+    if(ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'auth_overlay';
+    ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','auth_title');
+    ov.innerHTML = `
+      <div class="auth-box">
+        <div class="io-brand" style="margin-bottom:18px"><div class="io-mark" aria-hidden="true"></div><div><b>INSTITUTO OLHAR</b><span>Optometria comportamental</span></div></div>
+        <h2 id="auth_title">Entrar</h2>
+        <p class="muted" id="auth_msg" style="margin:4px 0 12px"></p>
+        <form id="auth_form" autocomplete="on">
+          <label for="auth_email">E-mail</label>
+          <input id="auth_email" type="email" autocomplete="username" required>
+          <label for="auth_pass">Senha</label>
+          <input id="auth_pass" type="password" autocomplete="current-password" required minlength="10">
+          <div id="auth_setup_fields" style="display:none">
+            <label for="auth_pass2">Repita a senha</label>
+            <input id="auth_pass2" type="password" autocomplete="new-password" minlength="10">
+            <label for="auth_key">Chave de instalação (o valor de AUTH_SECRET)</label>
+            <input id="auth_key" type="password" autocomplete="off">
+          </div>
+          <div class="auth-err" id="auth_err" role="alert"></div>
+          <button type="submit" id="auth_submit" style="width:100%;margin-top:14px">Entrar</button>
+        </form>
+        <button type="button" class="secondary" id="auth_offline" style="width:100%;margin-top:8px;display:none">Continuar sem internet (dados deste aparelho)</button>
+      </div>`;
+    document.body.appendChild(ov);
+    ov.querySelector('#auth_form').addEventListener('submit', submitAuth);
+    ov.querySelector('#auth_offline').addEventListener('click', ()=>{ hideLogin(); setSyncStatus('sem internet — dados só neste aparelho'); });
+    return ov;
+  }
+  let authMode = 'login';
+  function showLogin(msg, mode, offline){
+    const ov = authOverlay();
+    authMode = mode || 'login';
+    const setup = authMode === 'setup';
+    ov.querySelector('#auth_title').textContent = setup ? 'Criar a conta de acesso' : 'Entrar';
+    ov.querySelector('#auth_msg').textContent = msg || (setup ? 'Primeiro acesso: crie o e-mail e a senha que vão proteger o app. Senha com pelo menos 10 caracteres.' : '');
+    ov.querySelector('#auth_setup_fields').style.display = setup ? '' : 'none';
+    ov.querySelector('#auth_pass').autocomplete = setup ? 'new-password' : 'current-password';
+    ov.querySelector('#auth_submit').textContent = setup ? 'Criar conta e entrar' : 'Entrar';
+    ov.querySelector('#auth_offline').style.display = offline ? '' : 'none';
+    ov.querySelector('#auth_form').style.display = offline ? 'none' : '';
+    ov.querySelector('#auth_err').textContent = '';
+    ov.style.display = 'flex';
+    document.documentElement.classList.add('auth-locked');
+    setTimeout(()=>{ const f = ov.querySelector(offline ? '#auth_offline' : '#auth_email'); if(f) f.focus(); }, 30);
+  }
+  function hideLogin(){
+    const ov = document.getElementById('auth_overlay');
+    if(ov) ov.style.display = 'none';
+    document.documentElement.classList.remove('auth-locked');
+  }
+  function loggedIn(email){
+    identityReady = true;
+    const u = document.getElementById('sync_user'); if(u) u.textContent = email || 'autenticado';
+    const lo = document.getElementById('btn_logout'); if(lo) lo.style.display = '';
+    hideLogin();
     syncPull();
+  }
+  async function checkAuth(){
+    try{
+      const res = await fetch('/api/auth/status', { credentials:'same-origin', cache:'no-store' });
+      const d = await res.json();
+      if(!res.ok || d.configured === false){ showLogin('O servidor ainda não foi configurado (falta AUTH_SECRET). Fale com quem administra o app.'); return; }
+      if(d.user) return loggedIn(d.user);
+      showLogin('', d.setupNeeded ? 'setup' : 'login');
+    }catch(_){
+      showLogin('Sem conexão com o servidor. Você pode continuar com os dados salvos neste aparelho; a sincronização volta quando houver internet e você entrar.', 'login', true);
+    }
+  }
+  async function submitAuth(ev){
+    ev.preventDefault();
+    const ov = authOverlay();
+    const err = ov.querySelector('#auth_err');
+    const btn = ov.querySelector('#auth_submit');
+    const email = ov.querySelector('#auth_email').value.trim();
+    const password = ov.querySelector('#auth_pass').value;
+    err.textContent = '';
+    const body = { email, password };
+    if(authMode === 'setup'){
+      if(password !== ov.querySelector('#auth_pass2').value){ err.textContent = 'As senhas não conferem.'; return; }
+      body.setupKey = ov.querySelector('#auth_key').value;
+    }
+    btn.disabled = true;
+    try{
+      const res = await fetch('/api/auth/' + (authMode === 'setup' ? 'setup' : 'login'), {
+        method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body)
+      });
+      const d = await res.json().catch(()=>({}));
+      if(!res.ok){
+        if(res.status === 409 && authMode === 'setup'){ showLogin(d.error, 'login'); return; }
+        err.textContent = d.error || ('Erro ' + res.status);
+        return;
+      }
+      ov.querySelector('#auth_pass').value = '';
+      const p2 = ov.querySelector('#auth_pass2'); if(p2) p2.value = '';
+      const k = ov.querySelector('#auth_key'); if(k) k.value = '';
+      loggedIn(d.user);
+    }catch(_){
+      err.textContent = 'Sem conexão com o servidor. Tente de novo.';
+    }finally{ btn.disabled = false; }
   }
 
   function el(id){ return document.getElementById(id); }

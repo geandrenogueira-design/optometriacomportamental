@@ -45,3 +45,18 @@ CREATE TABLE IF NOT EXISTS anamnese (
   data         TEXT                    -- respostas (JSON)
 );
 CREATE INDEX IF NOT EXISTS anamnese_owner ON anamnese(owner, created_at);
+
+-- Login próprio do app (senha com PBKDF2; sessão em cookie assinado com AUTH_SECRET).
+CREATE TABLE IF NOT EXISTS users (
+  email      TEXT PRIMARY KEY,
+  pass_hash  TEXT NOT NULL,
+  salt       TEXT NOT NULL,
+  iterations INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
+-- Contador de senhas erradas para bloqueio progressivo (5 → 15 min, 10 → 1 h, 15+ → 6 h).
+CREATE TABLE IF NOT EXISTS login_attempts (
+  key          TEXT PRIMARY KEY,
+  fails        INTEGER NOT NULL,
+  locked_until INTEGER NOT NULL
+);

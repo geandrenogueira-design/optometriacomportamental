@@ -1,10 +1,10 @@
-// /api/anamnese/admin — área do clínico (protegida pelo Cloudflare Access).
+// /api/anamnese/admin — área do clínico (exige login no app).
 //   GET                 lista os links do usuário (sem as respostas)
 //   GET  ?code=XXX      um link com as respostas
 //   POST {action:'create', label, patientId?, days?}   gera um link novo
 //   POST {action:'mark_imported', code, patientId?}    marca como importada no app
 //   POST {action:'delete', code}                        apaga o link e as respostas
-import { json, authenticate } from '../../../lib/access.js';
+import { json, authenticate } from '../../../lib/auth.js';
 
 const DEFAULT_DAYS = 14;
 const MAX_DAYS = 60;

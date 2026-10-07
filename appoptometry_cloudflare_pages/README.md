@@ -3,7 +3,7 @@
 App clínico de optometria comportamental: TVPS-4, DTVP-3, DEM, NSUCO, vergência e acomodação, visão binocular e painel integrado.
 
 - **Hospedagem:** Cloudflare Pages (pasta `public/`).
-- **Login:** Cloudflare Access. A página só abre depois do login, feito por código no e-mail.
+- **Login:** próprio do app (e-mail e senha), sem Cloudflare Access e sem cartão de crédito. Senha guardada com PBKDF2, sessão em cookie seguro de 8 h, bloqueio progressivo após senhas erradas.
 - **Dados na nuvem:** banco D1, uma linha por paciente, com histórico diário guardado por 30 dias.
 - **Offline:** tudo fica salvo no navegador (localStorage) e sincroniza quando há internet.
 - **Backup manual:** botões **Exportar JSON** e **Importar JSON** no menu lateral.
@@ -13,10 +13,11 @@ App clínico de optometria comportamental: TVPS-4, DTVP-3, DEM, NSUCO, vergênci
 public/                     app estático (index.html, ui.js, clinicalEngine.js, normas)
 public/anamnese/            formulário dos pais (index.html) e definição das perguntas (schema.js)
 public/anamnese_admin.js    aba "Anamnese (pais)" do app
-functions/api/user-data.js  sincronização dos pacientes (protegida pelo Access)
+functions/api/auth/         login: status, setup (primeira conta), login, logout
+functions/api/user-data.js  sincronização dos pacientes (exige login)
 functions/api/migrate-kv.js migração única do KV da versão anterior (protegida, só leitura)
 functions/api/anamnese/     submit.js (pública: só recebe envios) e admin.js (protegida)
-lib/access.js               verificação do login do Access, usada pelas rotas protegidas
+lib/auth.js                 senhas, sessão e bloqueio, usados pelas rotas protegidas
 schema.sql                  tabelas do banco D1
 ```
 
@@ -26,7 +27,7 @@ schema.sql                  tabelas do banco D1
 
 ### 1. Banco D1
 1. No painel, abra **Storage & Databases → D1 → Create database** e dê o nome `appoptometry`.
-2. Abra o banco, vá em **Console**, cole o conteúdo de `schema.sql` e clique em **Execute**. Pode executar de novo quando o arquivo ganhar tabelas novas: os comandos não apagam o que já existe.
+2. Abra o banco, vá em **Console**, cole o conteúdo de `schema.sql` e clique em **Execute**. O arquivo cria 6 tabelas: user_meta, patients, patients_history, anamnese, users e login_attempts. Pode executar de novo quando o arquivo ganhar tabelas novas: os comandos não apagam o que já existe.
 
 ### 2. Projeto Pages
 Use o projeto Pages que já está ligado a este repositório. Confira em **Settings → Builds**:
@@ -38,38 +39,25 @@ Depois, em **Settings → Bindings**:
 - **Add → D1 database**, com Variable name `DB` e Database `appoptometry`. Faça para *Production* e *Preview*.
 - **Mantenha** o KV `OPTO_KV` da versão anterior até terminar a migração (seção abaixo). Depois ele pode ser removido.
 
-### 3. Cloudflare Access (login)
-1. Abra **Zero Trust → Access → Applications → Add an application → Self-hosted** e preencha:
-   - Application domain: `SEU-PROJETO.pages.dev`. Se for usar previews, adicione também `*.SEU-PROJETO.pages.dev`.
-   - Policy: **Allow**, com Include → **Emails** → o seu e-mail.
-   - Login method: **One-time PIN**, o código por e-mail que já vem ativo.
-2. Na aplicação criada, copie a **Application Audience (AUD) Tag**.
-3. Anote o domínio da equipe, no formato `suaequipe.cloudflareaccess.com`. Ele fica em **Zero Trust → Settings → Custom Pages**, como *Team domain*.
+### 3. Chave secreta (AUTH_SECRET)
+1. Gere um texto aleatório longo, com **pelo menos 32 caracteres**, e guarde-o num lugar seguro (por exemplo, no gerenciador de senhas).
+2. Em **Workers & Pages → optometriacomportamental → Settings → Variables and Secrets**, clique em **Add**:
+   - Type: **Secret** (não "Text")
+   - Variable name: `AUTH_SECRET`
+   - Value: o texto gerado, colado **sem aspas**
+3. Salve e vá em **Deployments → Retry deployment** (ou faça o merge, que publica de novo).
 
-### 3b. Liberar o formulário dos pais (Access)
-O formulário precisa abrir sem login. Crie uma **segunda** aplicação no Access, só para esses caminhos:
+Essa chave assina as sessões e é pedida **uma única vez**, no primeiro acesso, como "chave de instalação" para criar a sua conta. Se ela for trocada, todas as sessões abertas caem e é preciso entrar de novo.
 
-1. Abra **Zero Trust → Access → Applications → Add an application → Self-hosted**.
-2. Application domain: `SEU-PROJETO.pages.dev`, com o caminho `anamnese`. Clique em *Add domain* e acrescente o mesmo domínio com o caminho `api/anamnese/submit`.
-3. Policy: Action **Bypass**, Include → **Everyone**.
-
-O Access aplica a regra do caminho mais específico, então só essas duas rotas ficam abertas; todo o resto continua exigindo login. A rota pública só aceita um envio por código válido e não devolve nenhum dado guardado.
-
-### 4. Variáveis do Pages
-Em **Pages → (seu projeto) → Settings → Variables and Secrets**, crie as duas variáveis abaixo e depois faça **Retry deployment**:
-
-| Nome | Valor |
-|---|---|
-| `ACCESS_TEAM_DOMAIN` | `suaequipe.cloudflareaccess.com` (sem `https://`) |
-| `ACCESS_AUD` | a AUD Tag copiada no passo 3 |
-
-A API confere a assinatura do token do Access em toda requisição. Sem essas variáveis, ela recusa tudo, de propósito.
+### 4. Primeiro acesso
+1. Abra `https://optometriacomportamental.pages.dev`. Aparece a tela **Criar a conta de acesso**.
+2. Informe o e-mail, a senha (mínimo de 10 caracteres, duas vezes) e a chave de instalação (o valor de `AUTH_SECRET`).
+3. Depois que a conta existe, essa tela não aparece mais: só a de **Entrar**. Ninguém consegue criar outra conta sem a chave.
 
 ### 5. Teste
-1. Abra `o endereço do app (`https://SEU-PROJETO.pages.dev`)`, informe o e-mail e digite o código recebido.
-2. Confira o cartão **Nuvem e backup**: deve mostrar o seu e-mail e o status "ok".
-3. Cadastre um paciente fictício. O status deve passar para "ok — salvo na nuvem".
-4. Abra o app em outro aparelho e confira se o paciente aparece.
+1. No cartão **Nuvem e backup**, confira se aparece o seu e-mail e o status "ok".
+2. Cadastre um paciente fictício. O status deve passar para "ok — salvo na nuvem".
+3. Abra o app em outro aparelho, entre com o mesmo e-mail e senha e confira se o paciente aparece.
 
 ---
 

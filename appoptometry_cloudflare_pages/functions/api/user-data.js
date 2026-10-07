@@ -1,20 +1,14 @@
 // Cloudflare Pages Function — GET/POST /api/user-data
 //
-// Autenticação: Cloudflare Access. O Access protege o site inteiro e envia,
-// a cada requisição, um JWT assinado (header Cf-Access-Jwt-Assertion ou
-// cookie CF_Authorization). Aqui o token é VERIFICADO (assinatura RS256,
-// validade, audience e emissor) antes de qualquer leitura ou escrita.
-// Nunca confiamos só no header de e-mail, que pode ser forjado fora do Access.
+// Autenticação: login próprio do app (cookie de sessão assinado; ver lib/auth.js).
 //
 // Armazenamento: D1 (binding DB). Uma linha por paciente, para não esbarrar
 // no limite de tamanho de linha e gravar só o que mudou.
 //
-// Variáveis de ambiente (Pages → Settings → Variables):
-//   ACCESS_TEAM_DOMAIN  ex.: suaequipe.cloudflareaccess.com  (sem https://)
-//   ACCESS_AUD          "Application Audience (AUD) Tag" da aplicação no Access
+// Variável de ambiente: AUTH_SECRET (ver lib/auth.js)
 // Binding D1 (Pages → Settings → Bindings):  DB
 
-import { json, authenticate } from '../../lib/access.js';
+import { json, authenticate } from '../../lib/auth.js';
 
 const HISTORY_DAYS = 30;           // histórico diário de cada paciente
 const MAX_BODY_BYTES = 20 * 1024 * 1024;

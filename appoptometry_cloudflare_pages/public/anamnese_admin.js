@@ -17,7 +17,8 @@
       body: body ? JSON.stringify(body) : undefined,
     });
     const ctype = res.headers.get('Content-Type') || '';
-    if (res.redirected || !ctype.includes('application/json')) throw new Error('Sessão expirada: recarregue a página.');
+    if (!ctype.includes('application/json')) throw new Error('Resposta inesperada do servidor.');
+    if (res.status === 401) throw new Error('Sessão expirada: entre de novo (recarregue a página).');
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || ('Erro ' + res.status));
     return data;

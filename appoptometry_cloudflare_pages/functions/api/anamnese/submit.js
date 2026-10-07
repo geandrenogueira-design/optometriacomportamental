@@ -1,7 +1,7 @@
-// /api/anamnese/submit — ÚNICA rota pública da API (sem login do Access).
+// /api/anamnese/submit — rota pública da API (sem login): só recebe o envio dos pais.
 // Os pais só conseguem: (1) verificar se um código é válido e (2) enviar as
 // respostas uma única vez. Não conseguem ler nada que já esteja guardado.
-import { json } from '../../../lib/access.js';
+import { json } from '../../../lib/auth.js';
 
 const MAX_BODY = 300 * 1024;
 const MAX_STR = 8000;

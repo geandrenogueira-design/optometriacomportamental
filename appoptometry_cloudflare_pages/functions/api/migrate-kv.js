@@ -1,7 +1,7 @@
 // /api/migrate-kv — migração única dos dados da versão anterior (chave de sync no KV).
-// Protegida pelo Cloudflare Access. Só LÊ o KV antigo (binding OPTO_KV); não grava nada nele.
+// Exige login no app. Só LÊ o KV antigo (binding OPTO_KV); não grava nada nele.
 // Depois que os dados forem trazidos, o binding OPTO_KV pode ser removido do projeto.
-import { json, authenticate } from '../../lib/access.js';
+import { json, authenticate } from '../../lib/auth.js';
 
 export async function onRequestGet({ request, env }) {
   const auth = await authenticate(request, env);
