@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Questionário — Instituto Olhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#1e2d68; --marrom:#c4966e; --ciano:#cde7f1; --cinza:#cfd5d9;
+    --ink:#1b2340; --muted:#5d6785; --bg:#f6f8fa; --card:#fff; --line:#e3e8ee;
+    --ok:#2f7d5b; --err:#b4412f;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:Outfit,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
+  header{background:var(--azul);color:#fff;padding:18px 16px 14px}
+  .brand{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
+  .brand .dot{width:30px;height:30px;border-radius:50%;border:5px solid var(--ciano);border-right-color:transparent;transform:rotate(-45deg);flex:none}
+  .brand b{letter-spacing:.14em;font-weight:700;font-size:15px}
+  .brand span{display:block;font-size:12px;color:var(--ciano);letter-spacing:.02em}
+  .progress{max-width:760px;margin:12px auto 0;height:6px;background:rgba(255,255,255,.18);border-radius:6px;overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:var(--marrom);transition:width .25s}
+  .steplabel{max-width:760px;margin:6px auto 0;font-size:13px;color:var(--ciano)}
+  main{max-width:760px;margin:0 auto;padding:16px 16px 120px}
+  h1{font-size:24px;margin:6px 0 4px;color:var(--azul)}
+  h2{font-size:21px;margin:4px 0 10px;color:var(--azul)}
+  h3{font-size:16px;margin:22px 0 6px;color:var(--azul);text-transform:uppercase;letter-spacing:.06em}
+  .intro{color:var(--muted);margin:0 0 14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 12px}
+  .f{margin:0 0 16px}
+  .f > label,.f .q{display:block;font-weight:500;margin:0 0 6px}
+  .req{color:var(--err)}
+  input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],textarea{
+    width:100%;font:inherit;padding:11px 12px;border:1px solid var(--cinza);border-radius:10px;background:#fff;color:var(--ink)}
+  textarea{min-height:84px;resize:vertical}
+  input:focus,textarea:focus{outline:2px solid var(--azul);outline-offset:1px;border-color:var(--azul)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{position:relative}
+  .pill input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .pill span{display:inline-block;padding:9px 14px;border:1px solid var(--cinza);border-radius:999px;background:#fff;font-size:15px}
+  .pill input:checked + span{background:var(--azul);border-color:var(--azul);color:#fff}
+  .pill input:focus-visible + span{outline:2px solid var(--marrom);outline-offset:2px}
+  .desc{margin-top:8px}
+  .consent{display:flex;gap:12px;align-items:flex-start;background:var(--ciano);border-radius:12px;padding:14px}
+  .consent input{width:24px;height:24px;flex:none;margin-top:2px;accent-color:var(--azul)}
+  .grid-row{border-top:1px solid var(--line);padding:12px 0}
+  .grid-row:first-of-type{border-top:none}
+  .grid-row .rl{font-weight:500;margin-bottom:6px}
+  .g2{display:grid;grid-template-columns:1fr;gap:6px}
+  .g2 .sub{font-size:13px;color:var(--muted);margin-bottom:2px}
+  .item{border-top:1px solid var(--line);padding:14px 0}
+  .item:first-of-type{border-top:none}
+  .item .t{margin-bottom:8px}
+  .item .t b{color:var(--marrom);margin-right:6px}
+  .scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+  .scale label{position:relative}
+  .scale input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .scale span{display:flex;align-items:center;justify-content:center;text-align:center;min-height:46px;padding:4px 2px;border:1px solid var(--cinza);border-radius:9px;font-size:12px;line-height:1.15;background:#fff;hyphens:manual;-webkit-hyphens:manual}
+  .scale input:checked + span{background:var(--azul);border-color:var(--azul);color:#fff}
+  .scale input:focus-visible + span{outline:2px solid var(--marrom);outline-offset:1px}
+  .err{color:var(--err);font-size:14px;margin-top:6px}
+  .asknote{background:var(--ciano);border-radius:12px;padding:12px 14px;margin:0 0 12px;font-size:15px}
+  .ask{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--ciano);color:var(--azul);font-size:12px;font-weight:600;white-space:nowrap;vertical-align:1px}
+  .f.invalid input,.f.invalid textarea{border-color:var(--err)}
+  nav.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  nav.bar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+  button{font:inherit;font-weight:600;border-radius:12px;padding:13px 18px;border:1px solid var(--azul);background:#fff;color:var(--azul);cursor:pointer}
+  button.primary{background:var(--azul);color:#fff;flex:1}
+  button:disabled{opacity:.5;cursor:default}
+  .saved{font-size:12px;color:var(--muted)}
+  .center{text-align:center;padding:40px 8px}
+  .center .big{font-size:22px;color:var(--azul);font-weight:600;margin-bottom:8px}
+  footer{max-width:760px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:13px}
+  .hidden{display:none !important}
+  @media (min-width:640px){ .g2{grid-template-columns:1fr 1fr} .scale span{font-size:13.5px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="dot" aria-hidden="true"></div><div><b>INSTITUTO OLHAR</b><span>Cuidado humano para a sua visão</span></div></div>
+  <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+  <div class="steplabel" id="steplabel"></div>
+</header>
+
+<main id="main" aria-live="polite">
+  <div class="center"><div class="big">Carregando…</div></div>
+</main>
+
+<nav class="bar hidden" id="bar">
+  <div class="in">
+    <button type="button" id="btnBack">Voltar</button>
+    <button type="button" class="primary" id="btnNext">Continuar</button>
+  </div>
+  <div class="in"><span class="saved" id="saved"></span></div>
+</nav>
+
+<footer id="foot">
+  Instituto Olhar · Geandré Nogueira — Optometrista comportamental — CROO 1726<br>
+  Comercial Mauro Lima, sala 105 — Praça João Pessoa, 33, Centro, Garanhuns-PE · WhatsApp (87) 99936-0210
+</footer>
+
+<script src="schema.js"></script>
+<script>
+(function(){
+  'use strict';
+  const S = window.ANAMNESE_SCHEMA;
+  const code = new URLSearchParams(location.search).get('c') || '';
+  const KEY = 'anamnese_olhar_' + (code || 'sem_codigo');
+  const main = document.getElementById('main');
+  const bar = document.getElementById('bar');
+  const prog = document.getElementById('prog');
+  const stepLabel = document.getElementById('steplabel');
+  const savedEl = document.getElementById('saved');
+  const btnBack = document.getElementById('btnBack');
+  const btnNext = document.getElementById('btnNext');
+
+  let answers = {};
+  let step = 0;
+  const steps = S.sections.length; // + tela de revisão
+  try { const raw = localStorage.getItem(KEY); if (raw) { const d = JSON.parse(raw); answers = d.answers || {}; step = Math.min(d.step || 0, steps); } } catch(_){}
+
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify({ answers, step, at: Date.now() })); savedEl.textContent = 'Respostas salvas neste aparelho'; } catch(_){ savedEl.textContent = ''; }
+  }
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let uid = 0; const nid = () => 'i' + (++uid);
+
+  function center(title, text, extra){
+    bar.classList.add('hidden');
+    main.innerHTML = `<div class="center"><div class="big">${esc(title)}</div><p class="intro">${text}</p>${extra||''}</div>`;
+  }
+
+  // ---------- renderização dos campos ----------
+  function fieldHTML(f){
+    const v = answers[f.id];
+    const req = f.required ? ' <span class="req" aria-hidden="true">*</span>' : '';
+    const id = nid();
+    switch(f.type){
+      case 'heading': return `<h3>${esc(f.label)}</h3>`;
+      case 'text': case 'tel': case 'email': case 'date': case 'number': {
+        const attrs = f.type === 'number' ? ` inputmode="numeric" min="${f.min ?? ''}" max="${f.max ?? ''}"` : '';
+        return `<div class="f" data-f="${f.id}"><label for="${id}">${esc(f.label)}${req}</label>
+          <input id="${id}" type="${f.type}" data-k="${f.id}" value="${esc(v)}"${attrs}${f.type==='email'?' autocomplete="email"':''}${f.type==='tel'?' autocomplete="tel"':''}></div>`;
+      }
+      case 'textarea':
+        return `<div class="f" data-f="${f.id}"><label for="${id}">${esc(f.label)}${req}</label><textarea id="${id}" data-k="${f.id}">${esc(v)}</textarea></div>`;
+      case 'choice':
+        return `<div class="f" data-f="${f.id}" role="radiogroup" aria-label="${esc(f.label)}"><span class="q">${esc(f.label)}${req}</span><div class="pills">${
+          f.options.map(o=>`<label class="pill"><input type="radio" name="${f.id}" data-k="${f.id}" value="${esc(o)}"${v===o?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div></div>`;
+      case 'multi': {
+        const arr = Array.isArray(v) ? v : [];
+        return `<div class="f" data-f="${f.id}"><span class="q">${esc(f.label)}</span><div class="pills">${
+          f.options.map(o=>`<label class="pill"><input type="checkbox" data-multi="${f.id}" value="${esc(o)}"${arr.includes(o)?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div></div>`;
+      }
+      case 'yesno': {
+        const d = answers[f.id + '_desc'] || '';
+        return `<div class="f" data-f="${f.id}" role="radiogroup" aria-label="${esc(f.label)}"><span class="q">${esc(f.label)}${req}</span>
+          <div class="pills">${['sim','não'].map(o=>`<label class="pill"><input type="radio" name="${f.id}" data-k="${f.id}" value="${o==='não'?'nao':'sim'}"${v===(o==='não'?'nao':'sim')?' checked':''}><span>${o==='sim'?'Sim':'Não'}</span></label>`).join('')}</div>
+          ${f.describe ? `<div class="desc ${v==='sim'?'':'hidden'}" data-desc="${f.id}"><textarea data-k="${f.id}_desc" placeholder="Descreva" aria-label="Descreva: ${esc(f.label)}">${esc(d)}</textarea></div>` : ''}</div>`;
+      }
+      case 'consent':
+        return `<div class="f" data-f="${f.id}"><label class="consent"><input type="checkbox" data-bool="${f.id}"${v===true?' checked':''}><span>${esc(f.label)}${req}</span></label></div>`;
+      case 'grid': {
+        const g = (v && typeof v === 'object') ? v : {};
+        return `<div class="f" data-f="${f.id}"><h3>${esc(f.label)}</h3><div class="card">${f.rows.map(r=>{
+          const rv = g[r.id] || {};
+          return `<div class="grid-row"><div class="rl">${esc(r.label)}</div><div class="pills">${
+            f.options.map(o=>`<label class="pill"><input type="radio" name="${f.id}_${r.id}" data-grid="${f.id}" data-row="${r.id}" value="${esc(o)}"${rv.v===o?' checked':''}><span>${esc(o)}</span></label>`).join('')}</div>
+            ${f.describe?`<div class="desc ${rv.v && rv.v!==f.options[0]?'':'hidden'}" data-gdesc="${f.id}_${r.id}"><input type="text" data-grid="${f.id}" data-row="${r.id}" data-gd="1" placeholder="Que ajuda precisa?" value="${esc(rv.desc||'')}"></div>`:''}</div>`;
+        }).join('')}</div></div>`;
+      }
+      case 'grid2': {
+        const g = (v && typeof v === 'object') ? v : {};
+        return `<div class="f" data-f="${f.id}"><h3>${esc(f.label)}</h3><div class="card">${f.rows.map(r=>{
+          const rv = g[r.id] || {};
+          return `<div class="grid-row"><div class="rl">${esc(r.label)}</div><div class="g2">${
+            ['a','b'].map((c,ci)=>`<div><div class="sub">${esc(f.cols[ci])}</div><div class="pills">${['sim','nao'].map(o=>
+              `<label class="pill"><input type="radio" name="${f.id}_${r.id}_${c}" data-grid2="${f.id}" data-row="${r.id}" data-col="${c}" value="${o}"${rv[c]===o?' checked':''}><span>${o==='sim'?'Sim':'Não'}</span></label>`).join('')}</div></div>`).join('')}</div></div>`;
+        }).join('')}</div></div>`;
+      }
+      case 'scale': {
+        const g = (v && typeof v === 'object') ? v : {};
+        return `<div class="card">${f.items.map(it=>`<div class="item" role="radiogroup" aria-label="${esc(it.t)}"><div class="t"><b>${it.n}</b>${esc(it.t)}${it.ask ? '<span class="ask">💬 Pergunte à criança</span>' : ''}</div><div class="scale">${
+          S.scale.map(sc=>`<label><input type="radio" name="sint_${it.n}" data-scale="${f.id}" data-n="${it.n}" value="${sc.v}"${String(g[it.n])===String(sc.v)?' checked':''}><span>${esc(sc.label).replace('Raramente','Rara\u00ADmente').replace('Frequentemente','Frequen\u00ADte\u00ADmente')}</span></label>`).join('')}</div></div>`).join('')}</div>`;
+      }
+    }
+    return '';
+  }
+
+  function renderStep(){
+    bar.classList.remove('hidden');
+    prog.style.width = Math.round((step / steps) * 100) + '%';
+    if (step >= steps) return renderReview();
+    const sec = S.sections[step];
+    stepLabel.textContent = `Etapa ${step + 1} de ${steps}`;
+    main.innerHTML = (step === 0 ? `<h1>${esc(S.title)}</h1>` : '') +
+      `<h2>${esc(sec.title)}</h2>` + (sec.intro ? `<p class="intro">${esc(sec.intro)}</p>` : '') +
+      (sec.askNote ? `<div class="asknote"><b>💬 Pergunte à criança</b><br>${esc(sec.askNote)}</div>` : '') +
+      `<div class="${sec.fields.some(f=>f.type==='scale'||f.type==='grid'||f.type==='grid2') ? '' : 'card'}">${sec.fields.map(fieldHTML).join('')}</div>`;
+    btnBack.disabled = step === 0;
+    btnNext.textContent = step === steps - 1 ? 'Revisar e enviar' : 'Continuar';
+    window.scrollTo(0, 0);
+  }
+
+  function renderReview(){
+    stepLabel.textContent = 'Revisão';
+    const sint = answers.sintomas || {};
+    const items = S.sections.find(s=>s.id==='s9').fields[0].items;
+    const faltam = items.filter(it => sint[it.n] === undefined).map(it => it.n);
+    main.innerHTML = `<h2>Tudo pronto?</h2>
+      <div class="card">
+        <p><b>Criança:</b> ${esc(answers.crianca_nome || '—')}<br><b>Preenchido por:</b> ${esc(answers.respondente || '—')}</p>
+        ${faltam.length ? `<p class="intro">Ficaram sem resposta ${faltam.length} itens de sinais e sintomas (nº ${faltam.slice(0,12).join(', ')}${faltam.length>12?'…':''}). Você pode voltar e completar, ou enviar assim mesmo.</p>` : '<p class="intro">Todos os itens de sinais e sintomas foram respondidos.</p>'}
+        <p class="intro">Depois de enviar, não será possível alterar as respostas por este link. Se precisar corrigir algo, fale com o consultório.</p>
+        <div class="err hidden" id="sendErr"></div>
+      </div>
+      <button type="button" id="btnDownload">Baixar uma cópia das respostas</button>`;
+    document.getElementById('btnDownload').addEventListener('click', downloadCopy);
+    btnBack.disabled = false;
+    btnNext.textContent = 'Enviar ao consultório';
+    window.scrollTo(0, 0);
+  }
+
+  function downloadCopy(){
+    const blob = new Blob([JSON.stringify({ schema: S.id, schemaVersion: S.version, code, savedAt: new Date().toISOString(), answers }, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'questionario-olhar-' + String(answers.crianca_nome || 'crianca').toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.json';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  // ---------- captura das respostas ----------
+  main.addEventListener('input', onChange);
+  main.addEventListener('change', onChange);
+  function onChange(e){
+    const t = e.target;
+    if (t.dataset.k){
+      if (t.type === 'radio' && !t.checked) return;
+      answers[t.dataset.k] = t.type === 'number' ? (t.value === '' ? '' : Number(t.value)) : t.value;
+      const box = main.querySelector(`[data-desc="${t.dataset.k}"]`);
+      if (box) box.classList.toggle('hidden', t.value !== 'sim');
+      const f = t.closest('.f'); if (f) { f.classList.remove('invalid'); const er = f.querySelector('.err'); if (er) er.remove(); }
+    } else if (t.dataset.bool){
+      answers[t.dataset.bool] = t.checked;
+      const f = t.closest('.f'); if (f) { f.classList.remove('invalid'); const er = f.querySelector('.err'); if (er) er.remove(); }
+    } else if (t.dataset.multi){
+      const id = t.dataset.multi;
+      answers[id] = Array.from(main.querySelectorAll(`[data-multi="${id}"]:checked`)).map(x=>x.value);
+    } else if (t.dataset.grid){
+      const g = answers[t.dataset.grid] = answers[t.dataset.grid] || {};
+      const r = g[t.dataset.row] = g[t.dataset.row] || {};
+      if (t.dataset.gd) r.desc = t.value;
+      else if (t.checked){
+        r.v = t.value;
+        const f = S.sections.flatMap(s=>s.fields).find(x=>x.id===t.dataset.grid);
+        const box = main.querySelector(`[data-gdesc="${t.dataset.grid}_${t.dataset.row}"]`);
+        if (box && f) box.classList.toggle('hidden', t.value === f.options[0]);
+      }
+    } else if (t.dataset.grid2 && t.checked){
+      const g = answers[t.dataset.grid2] = answers[t.dataset.grid2] || {};
+      const r = g[t.dataset.row] = g[t.dataset.row] || {};
+      r[t.dataset.col] = t.value;
+    } else if (t.dataset.scale && t.checked){
+      const g = answers[t.dataset.scale] = answers[t.dataset.scale] || {};
+      g[t.dataset.n] = Number(t.value);
+    } else return;
+    save();
+  }
+
+  function validateStep(){
+    const sec = S.sections[step];
+    let first = null;
+    sec.fields.forEach(f=>{
+      if (!f.required) return;
+      const v = answers[f.id];
+      const ok = f.type === 'consent' ? v === true : (v !== undefined && v !== null && String(v).trim() !== '');
+      const el = main.querySelector(`[data-f="${f.id}"]`);
+      if (!el) return;
+      el.classList.toggle('invalid', !ok);
+      const old = el.querySelector('.err'); if (old) old.remove();
+      if (!ok){
+        el.insertAdjacentHTML('beforeend', `<div class="err">${f.type==='consent' ? 'Para continuar, é preciso aceitar o termo.' : 'Campo obrigatório.'}</div>`);
+        if (!first) first = el;
+      }
+    });
+    if (first){ first.scrollIntoView({ behavior:'smooth', block:'center' }); return false; }
+    return true;
+  }
+
+  async function send(){
+    const errEl = document.getElementById('sendErr');
+    btnNext.disabled = true; btnNext.textContent = 'Enviando…';
+    try{
+      const res = await fetch('/api/anamnese/submit', { method:'POST', headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({ c: code, schema: S.id, schemaVersion: S.version, answers }) });
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok){
+        if (data.missing && data.missing.length){
+          const idx = S.sections.findIndex(s=>s.fields.some(f=>f.id===data.missing[0]));
+          if (idx >= 0){ step = idx; save(); renderStep(); validateStep(); btnNext.disabled = false; return; }
+        }
+        throw new Error(data.error || ('Erro ' + res.status));
+      }
+      try { localStorage.removeItem(KEY); } catch(_){}
+      prog.style.width = '100%';
+      stepLabel.textContent = '';
+      center('Recebemos as respostas. Obrigado!', 'O questionário chegou ao Instituto Olhar e será lido antes da consulta. Até breve!');
+    }catch(e){
+      errEl.textContent = (e.message || 'Não foi possível enviar.') + ' Suas respostas continuam salvas neste aparelho: tente de novo em instantes. Se o problema continuar, baixe uma cópia e envie pelo WhatsApp do consultório.';
+      errEl.classList.remove('hidden');
+      btnNext.disabled = false; btnNext.textContent = 'Tentar enviar de novo';
+    }
+  }
+
+  btnBack.addEventListener('click', ()=>{ if (step > 0){ step--; save(); renderStep(); } });
+  btnNext.addEventListener('click', ()=>{
+    if (step >= steps) return send();
+    if (!validateStep()) return;
+    step++; save(); renderStep();
+  });
+
+  // ---------- início: confere o link ----------
+  async function start(){
+    if (!code){ center('Link incompleto', 'Use o link enviado pelo consultório pelo WhatsApp. Se não recebeu, fale com o Instituto Olhar.'); return; }
+    try{
+      const res = await fetch('/api/anamnese/submit?c=' + encodeURIComponent(code), { cache:'no-store' });
+      const d = await res.json();
+      if (d.state === 'respondido'){ center('Este questionário já foi enviado', 'Obrigado! Se precisar corrigir alguma resposta, fale com o consultório.'); return; }
+      if (d.state === 'expirado'){ center('Este link expirou', 'Peça um novo link ao Instituto Olhar.'); return; }
+      if (d.state !== 'aberto'){ center('Link inválido', 'Confira se o link foi copiado inteiro, ou peça um novo ao consultório.'); return; }
+      if (d.label && !answers.crianca_nome) answers.crianca_nome = d.label;
+    }catch(_){
+      // sem internet: deixa preencher; o envio tenta de novo no fim
+    }
+    renderStep();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
