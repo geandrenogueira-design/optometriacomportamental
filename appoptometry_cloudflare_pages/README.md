@@ -61,6 +61,18 @@ Essa chave assina as sessões e é pedida **uma única vez**, no primeiro acesso
 2. Cadastre um paciente fictício. O status deve passar para "ok — salvo na nuvem".
 3. Abra o app em outro aparelho, entre com o mesmo e-mail e senha e confira se o paciente aparece.
 
+### 6. Esqueci a senha (envio por e-mail)
+Na tela de entrar, **Esqueci a senha** envia um link de uso único, válido por 30 minutos. O envio usa o [Resend](https://resend.com) (plano gratuito, sem cartão):
+1. Crie a conta no Resend **com o mesmo e-mail que você usa para entrar no app**. Sem domínio próprio, o Resend só entrega para o e-mail dono da conta.
+2. Em **API Keys → Create API key**, permissão "Sending access", e copie a chave (começa com `re_`).
+3. No Cloudflare, em **Settings → Variables and Secrets → Add**: Type **Secret**, nome `RESEND_API_KEY`, valor = a chave. Depois, **Retry deployment**.
+
+A tabela `password_resets` é criada sozinha no primeiro uso. Proteções: a resposta é a mesma exista ou não a conta; no máximo 3 e-mails por hora; o link só guarda o hash no banco; pedir um link novo invalida o anterior; trocar a senha desbloqueia o login.
+
+**Sem acesso ao e-mail?** Use **Não recebeu o e-mail? Usar a chave de instalação**: informe o e-mail, a nova senha e o valor de `AUTH_SECRET`. Funciona mesmo sem o Resend configurado.
+
+Opcional: com um domínio próprio verificado no Resend, defina `MAIL_FROM` (ex.: `Instituto Olhar <nao-responda@seudominio.com.br>`) para enviar a qualquer endereço.
+
 ---
 
 ## Anamnese preenchida pelos pais

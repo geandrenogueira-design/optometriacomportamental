@@ -60,3 +60,10 @@ CREATE TABLE IF NOT EXISTS login_attempts (
   fails        INTEGER NOT NULL,
   locked_until INTEGER NOT NULL
 );
+
+-- Redefinição de senha por e-mail: guarda só o hash do código do link (uso único, 30 min).
+CREATE TABLE IF NOT EXISTS password_resets (
+  token_hash TEXT PRIMARY KEY,
+  email      TEXT NOT NULL,
+  expires_at INTEGER NOT NULL
+);
