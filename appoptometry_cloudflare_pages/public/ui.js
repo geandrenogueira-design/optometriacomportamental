@@ -525,7 +525,7 @@
           <div class="dash-panel">
             <div class="dash-panel-head">
               <div class="dash-panel-title">NSUCO — Radar</div>
-              <div class="dash-panel-sub" id="dash_nsuco_meta">Pursuits × Saccades • Alvo 4</div>
+              <div class="dash-panel-sub" id="dash_nsuco_meta">Seguimentos × Sacádicos • Alvo 4</div>
             </div>
             <canvas id="panel_nsuco_radar" width="720" height="380"></canvas>
           </div>
@@ -726,6 +726,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
   }
 
   function showToast(msg, ok=true){
+    if(window.__uxQuiet) return;   // salvamento automático: sem avisos repetidos
     const box = el('toast');
     box.textContent = msg;
     box.className = 'toast ' + (ok?'ok':'err') + ' show';
@@ -817,6 +818,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
     else state.patients.unshift(patient);
     saveState();
     renderPatients();
+    try{ document.dispatchEvent(new CustomEvent('olhar:saved', { detail:{ id: patient.id } })); }catch(_){ }
   }
 
   function getSelectedPatient(){
@@ -853,6 +855,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
 
     // panel
     renderIntegratedPanel(p);
+    try{ document.dispatchEvent(new CustomEvent('olhar:patient', { detail:{ id: p.id } })); }catch(_){ }
   }
   function renderPatients(){
     const box = el('patient_list');
@@ -1542,14 +1545,14 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
     const pass = (v)=> Number.isFinite(v) && v >= 4;
     const classifyBlock = (label, obj, hb)=>{
       const items = [
-        ['Ability', obj.ability],
-        ['Accuracy', obj.accuracy],
-        ['Head', obj.head],
-        ['Body', obj.body]
+        ['Habilidade', obj.ability],
+        ['Precisão', obj.accuracy],
+        ['Cabeça', obj.head],
+        ['Corpo', obj.body]
       ];
       const failed = items.filter(([,v])=> Number.isFinite(v) && v <= 3).map(([k,v])=> `${k}:${v}`);
       const ok = items.every(([,v])=> pass(v));
-      const hbText = (hb==null) ? '' : ` • Head/Body(min)=${hb}${pass(hb)?' (OK)':' (ALTERADO)'}`;
+      const hbText = (hb==null) ? '' : ` • Cabeça/Corpo(mín)=${hb}${pass(hb)?' (OK)':' (ALTERADO)'}`;
       return {
         label,
         ok,
@@ -1557,8 +1560,8 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
         text: ok ? `${label}: OK (4–5 em todos os itens)${hbText}` : `${label}: ALTERADO (≤3 em: ${failed.join(', ') || '—'})${hbText}`
       };
     };
-    const cP = classifyBlock('Pursuits', pursuits, pursuitsHB);
-    const cS = classifyBlock('Saccades', saccades, saccadesHB);
+    const cP = classifyBlock('Seguimentos', pursuits, pursuitsHB);
+    const cS = classifyBlock('Sacádicos', saccades, saccadesHB);
     const overallOk = cP.ok && cS.ok;
     const overallText = overallOk ? 'Global: OK' : 'Global: ALTERADO';
 
@@ -1588,10 +1591,10 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
           return `<div class="muted small">${escapeHtml(label)}: sem norma (idade/sexo fora da tabela ou ausente)</div>`;
         }
         const items = [
-          ['Ability', obj.ability, min.ability],
-          ['Accuracy', obj.accuracy, min.accuracy],
-          ['Head', obj.head, min.head],
-          ['Body', obj.body, min.body]
+          ['Habilidade', obj.ability, min.ability],
+          ['Precisão', obj.accuracy, min.accuracy],
+          ['Cabeça', obj.head, min.head],
+          ['Corpo', obj.body, min.body]
         ];
         const cols = items.map(([k,v,mn])=>{
           const ok = Number.isFinite(v) ? (v >= mn) : null;
@@ -1606,7 +1609,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
         return `<div style="margin-top:8px">
           <div style="font-weight:600;margin-bottom:4px">${escapeHtml(label)} — norma mínima (${escapeHtml(ageKey)}a, ${escapeHtml(sex)})</div>
           <div class="row small" style="grid-template-columns:0.9fr 0.4fr 0.4fr 0.5fr;gap:8px;margin-bottom:4px;opacity:.8">
-            <div class="k">Item</div><div class="k">Score</div><div class="k">Mín</div><div class="k">Status</div>
+            <div class="k">Item</div><div class="k">Escore</div><div class="k">Mín</div><div class="k">Status</div>
           </div>
           ${cols}
         </div>`;
@@ -1614,8 +1617,8 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
 
       normHtml = `<div class="card" style="margin-top:10px">
         <div class="k">Normas NSUCO (mínimo aceitável)</div>
-        ${normRow('Pursuits', pursuits, minP)}
-        ${normRow('Saccades', saccades, minS)}
+        ${normRow('Seguimentos', pursuits, minP)}
+        ${normRow('Sacádicos', saccades, minS)}
       </div>`;
     }catch(e){
       normHtml = `<div class="muted small">Normas: erro ao avaliar (${escapeHtml(String(e && e.message ? e.message : e))})</div>`;
@@ -1642,7 +1645,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
         <div class="grid3" style="margin-bottom:10px">
           <div>
             <div class="k">Critério de classificação</div>
-            <div class="v small">Por item: 4–5 = OK • ≤3 = Alterado • Head/Body(min)=pior dos dois</div>
+            <div class="v small">Por item: 4–5 = OK • ≤3 = Alterado • Cabeça/Corpo(mín)=pior dos dois</div>
           </div>
           <div>
             <div class="k">Resumo</div>
@@ -1660,23 +1663,23 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
           <thead>
             <tr>
               <th>Seção</th>
-              <th>Ability</th>
-              <th>Accuracy</th>
-              <th>Head</th>
-              <th>Body</th>
+              <th>Habilidade</th>
+              <th>Precisão</th>
+              <th>Cabeça</th>
+              <th>Corpo</th>
               <th>H/B (min)</th>
               <th>Total</th>
             </tr>
           </thead>
           <tbody>
-            ${row('Pursuits', pursuits, pursuitsHB, totals.pursuitsTotal)}
-            ${row('Saccades', saccades, saccadesHB, totals.saccadesTotal)}
+            ${row('Seguimentos', pursuits, pursuitsHB, totals.pursuitsTotal)}
+            ${row('Sacádicos', saccades, saccadesHB, totals.saccadesTotal)}
           </tbody>
         </table>
 
         <div class="muted" style="margin-top:8px">
-          <b>Legend (tabela de pontuação):</b><br>
-          Ability: ${escapeHtml(descAbility(pursuits.ability))} • Accuracy: ${escapeHtml(descAccuracy(pursuits.accuracy))} • Head/Body: ${escapeHtml(descHeadBody(pursuitsHB ?? ''))}
+          <b>Legenda (tabela de pontuação):</b><br>
+          Habilidade: ${escapeHtml(descAbility(pursuits.ability))} • Precisão: ${escapeHtml(descAccuracy(pursuits.accuracy))} • Cabeça/Corpo: ${escapeHtml(descHeadBody(pursuitsHB ?? ''))}
         </div>
         ${notesHtml}
       </div>
@@ -2213,7 +2216,7 @@ function saveBinocular(){
     if(BINOCULAR_SHOW_JSON){
       html += `<div class="card"><div class="k">JSON salvo</div><pre class="mono small">${escapeHtml(JSON.stringify(out,null,2))}</pre></div>`;
     }else{
-      html += `<div class="muted small">Dica: clique em “Ver JSON” se precisar copiar/exportar exatamente os valores gravados.</div>`;
+
     }
 
     setHTML('bin_out', html);
@@ -2245,7 +2248,7 @@ function saveBinocular(){
       const dtvpLine = dtvp ? (dtvp.composites ? `PVG=${dtvp.composites.pvg ?? '—'} • IVM=${dtvp.composites.ivm ?? '—'} • PVRM=${dtvp.composites.pvrm ?? '—'}` : '—') : '—';
       const demLine  = dem ? `Ratio=${fmt2(dem.ratio)} • ZR=${fmt2(dem.z?.ratio)}` : '—';
 
-      const nsucoLine = nsuco ? `Pursuits=${fmtN(nsuco.pursuits?.ability)}/${fmtN(nsuco.pursuits?.accuracy)}/${fmtN(nsuco.pursuits?.head)}/${fmtN(nsuco.pursuits?.body)} • Saccades=${fmtN(nsuco.saccades?.ability)}/${fmtN(nsuco.saccades?.accuracy)}/${fmtN(nsuco.saccades?.head)}/${fmtN(nsuco.saccades?.body)}` : '—';
+      const nsucoLine = nsuco ? `Seguimentos=${fmtN(nsuco.pursuits?.ability)}/${fmtN(nsuco.pursuits?.accuracy)}/${fmtN(nsuco.pursuits?.head)}/${fmtN(nsuco.pursuits?.body)} • Sacádicos=${fmtN(nsuco.saccades?.ability)}/${fmtN(nsuco.saccades?.accuracy)}/${fmtN(nsuco.saccades?.head)}/${fmtN(nsuco.saccades?.body)}` : '—';
 
       const binLine = bin ? `Foria L/P: ${phor(binCD)} / ${phor(binCN)} • PPC(Q/R): ${fmtNum(binNB)} / ${fmtNum(binNR)} cm` : '—';
       const bnvLine = bnvData ? `Worth D/N: ${fmtStr(bnvData.w4d_distance ?? bnvData.w4dDistance)}/${fmtStr(bnvData.w4d_near ?? bnvData.w4dNear)} • Titmus: ${fmtStr(bnvData.titmus_circles_arcsec ?? bnvData.titmusCircles ?? bnvData.titmusCirclesArcsec)}" • Dot2: ${fmtNum(bnvData.dot2_arcsec ?? bnvData.dot2)}" • Fix: ${fmtNum(bnvData.fix_seconds ?? bnvData.fixSeconds)}s` : '—';
@@ -2262,7 +2265,7 @@ function saveBinocular(){
       const pTotal = nsuco?.totals?.pursuitsTotal ?? (nsuco ? ((nsuco.pursuits?.ability??0)+(nsuco.pursuits?.accuracy??0)+(nsuco.pursuits?.head??0)+(nsuco.pursuits?.body??0)) : null);
       const sTotal = nsuco?.totals?.saccadesTotal ?? (nsuco ? ((nsuco.saccades?.ability??0)+(nsuco.saccades?.accuracy??0)+(nsuco.saccades?.head??0)+(nsuco.saccades?.body??0)) : null);
       safeSetText('dash_nsuco_v', nsuco ? `${pTotal ?? '—'} / ${sTotal ?? '—'}` : '—');
-      safeSetText('dash_nsuco_s', nsuco ? 'Pursuits / Saccades (soma 0–20)' : 'Sem dados');
+      safeSetText('dash_nsuco_s', nsuco ? 'Seguimentos / Sacádicos (soma 0–20)' : 'Sem dados');
 
       
       // DTVP card
@@ -2478,8 +2481,8 @@ setHTML('panel_integrado', `
     const c1 = (rs.getPropertyValue('--chart1')||'').trim() || '#2563eb';
     const c2 = (rs.getPropertyValue('--chart2')||'').trim() || '#16a34a';
     drawRadarChart(canvas, axes, [
-      {name:'Pursuits', values:pVals, color:c1},
-      {name:'Saccades', values:sVals, color:c2},
+      {name:'Seguimentos', values:pVals, color:c1},
+      {name:'Sacádicos', values:sVals, color:c2},
     ], 1, 5, 4);
   }
 
@@ -2698,6 +2701,7 @@ function showTabById(t){
     document.querySelectorAll('[data-tab]').forEach(b=>{
       b.classList.toggle('active', b.getAttribute('data-tab')===t);
     });
+    try{ document.dispatchEvent(new CustomEvent('olhar:tab', { detail:{ id: t } })); }catch(_){ }
   }
 
   function initNav(){
@@ -3269,6 +3273,8 @@ lines.push('------------------------------------------------------------');
       findPatient: (id)=> state.patients.find(p=>p.id===id) || null,
       listPatients: ()=> state.patients.slice(),
       calcAge: (dob)=> window.ClinicalEngine.calcAgeYMD(dob, new Date()),
+      renderPanel: (p)=> renderIntegratedPanel(p),
+      showTab: (t)=> showTabById(t),
     };
     repairTabNesting();
     // critical: verify norms loaded
