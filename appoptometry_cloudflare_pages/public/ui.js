@@ -377,42 +377,90 @@
         <h2 id="auth_title">Entrar</h2>
         <p class="muted" id="auth_msg" style="margin:4px 0 12px"></p>
         <form id="auth_form" autocomplete="on">
-          <label for="auth_email">E-mail</label>
-          <input id="auth_email" type="email" autocomplete="username" required>
-          <label for="auth_pass">Senha</label>
-          <input id="auth_pass" type="password" autocomplete="current-password" required minlength="10">
-          <div id="auth_setup_fields" style="display:none">
+          <div id="auth_email_wrap">
+            <label for="auth_email">E-mail</label>
+            <input id="auth_email" type="email" autocomplete="username">
+          </div>
+          <div id="auth_pass_wrap">
+            <label for="auth_pass" id="auth_pass_label">Senha</label>
+            <input id="auth_pass" type="password" autocomplete="current-password" minlength="10">
+          </div>
+          <div id="auth_pass2_wrap" style="display:none">
             <label for="auth_pass2">Repita a senha</label>
             <input id="auth_pass2" type="password" autocomplete="new-password" minlength="10">
+          </div>
+          <div id="auth_key_wrap" style="display:none">
             <label for="auth_key">Chave de instalação (o valor de AUTH_SECRET)</label>
             <input id="auth_key" type="password" autocomplete="off">
           </div>
           <div class="auth-err" id="auth_err" role="alert"></div>
+          <div class="auth-ok" id="auth_ok" role="status"></div>
           <button type="submit" id="auth_submit" style="width:100%;margin-top:14px">Entrar</button>
         </form>
+        <div class="auth-links" id="auth_links">
+          <button type="button" class="auth-link" id="auth_go_forgot">Esqueci a senha</button>
+          <button type="button" class="auth-link" id="auth_go_resetkey">Não recebeu o e-mail? Usar a chave de instalação</button>
+          <button type="button" class="auth-link" id="auth_go_login">Voltar para entrar</button>
+        </div>
         <button type="button" class="secondary" id="auth_offline" style="width:100%;margin-top:8px;display:none">Continuar sem internet (dados deste aparelho)</button>
       </div>`;
     document.body.appendChild(ov);
     ov.querySelector('#auth_form').addEventListener('submit', submitAuth);
     ov.querySelector('#auth_offline').addEventListener('click', ()=>{ hideLogin(); setSyncStatus('sem internet — dados só neste aparelho'); });
+    ov.querySelector('#auth_go_forgot').addEventListener('click', ()=> showLogin('', 'forgot'));
+    ov.querySelector('#auth_go_resetkey').addEventListener('click', ()=> showLogin('', 'resetkey'));
+    ov.querySelector('#auth_go_login').addEventListener('click', ()=>{
+      if(resetToken){ resetToken = null; dropResetFromUrl(); }
+      showLogin('', 'login');
+    });
     return ov;
   }
   let authMode = 'login';
+  let resetToken = null;
+  // Modos da tela: login | setup | forgot (pede o link) | reset (link do e-mail) | resetkey (chave de instalação)
+  const AUTH_MODES = {
+    login:    { title:'Entrar', submit:'Entrar', fields:['email','pass'], links:['forgot'], passLabel:'Senha', msg:'' },
+    setup:    { title:'Criar a conta de acesso', submit:'Criar conta e entrar', fields:['email','pass','pass2','key'], links:[], passLabel:'Senha',
+                msg:'Primeiro acesso: crie o e-mail e a senha que vão proteger o app. Senha com pelo menos 10 caracteres.' },
+    forgot:   { title:'Esqueci a senha', submit:'Enviar link por e-mail', fields:['email'], links:['resetkey','login'], passLabel:'Senha',
+                msg:'Informe o e-mail da conta. Enviaremos um link para criar uma nova senha (vale 30 minutos).' },
+    reset:    { title:'Criar nova senha', submit:'Salvar nova senha e entrar', fields:['pass','pass2'], links:['login'], passLabel:'Nova senha',
+                msg:'Escolha uma nova senha com pelo menos 10 caracteres.' },
+    resetkey: { title:'Redefinir com a chave de instalação', submit:'Salvar nova senha e entrar', fields:['email','pass','pass2','key'], links:['login'], passLabel:'Nova senha',
+                msg:'Sem acesso ao e-mail? Use a chave de instalação (o valor de AUTH_SECRET no Cloudflare) para trocar a senha.' },
+  };
+  function dropResetFromUrl(){
+    try{ const u = new URL(location.href); u.searchParams.delete('reset'); history.replaceState(null, '', u.pathname + u.search + u.hash); }catch(_){ }
+  }
   function showLogin(msg, mode, offline){
     const ov = authOverlay();
-    authMode = mode || 'login';
-    const setup = authMode === 'setup';
-    ov.querySelector('#auth_title').textContent = setup ? 'Criar a conta de acesso' : 'Entrar';
-    ov.querySelector('#auth_msg').textContent = msg || (setup ? 'Primeiro acesso: crie o e-mail e a senha que vão proteger o app. Senha com pelo menos 10 caracteres.' : '');
-    ov.querySelector('#auth_setup_fields').style.display = setup ? '' : 'none';
-    ov.querySelector('#auth_pass').autocomplete = setup ? 'new-password' : 'current-password';
-    ov.querySelector('#auth_submit').textContent = setup ? 'Criar conta e entrar' : 'Entrar';
+    authMode = AUTH_MODES[mode] ? mode : 'login';
+    const m = AUTH_MODES[authMode];
+    ov.querySelector('#auth_title').textContent = m.title;
+    ov.querySelector('#auth_msg').textContent = msg || m.msg;
+    const show = (k)=> m.fields.includes(k);
+    ov.querySelector('#auth_email_wrap').style.display = show('email') ? '' : 'none';
+    ov.querySelector('#auth_pass_wrap').style.display = show('pass') ? '' : 'none';
+    ov.querySelector('#auth_pass2_wrap').style.display = show('pass2') ? '' : 'none';
+    ov.querySelector('#auth_key_wrap').style.display = show('key') ? '' : 'none';
+    ov.querySelector('#auth_email').required = show('email');
+    ov.querySelector('#auth_pass').required = show('pass');
+    ov.querySelector('#auth_pass_label').textContent = m.passLabel;
+    ov.querySelector('#auth_pass').autocomplete = authMode === 'login' ? 'current-password' : 'new-password';
+    ov.querySelector('#auth_submit').textContent = m.submit;
+    ov.querySelector('#auth_go_forgot').style.display = m.links.includes('forgot') ? '' : 'none';
+    ov.querySelector('#auth_go_resetkey').style.display = m.links.includes('resetkey') ? '' : 'none';
+    ov.querySelector('#auth_go_login').style.display = m.links.includes('login') ? '' : 'none';
+    ov.querySelector('#auth_links').style.display = offline ? 'none' : '';
     ov.querySelector('#auth_offline').style.display = offline ? '' : 'none';
     ov.querySelector('#auth_form').style.display = offline ? 'none' : '';
     ov.querySelector('#auth_err').textContent = '';
+    ov.querySelector('#auth_ok').textContent = '';
     ov.style.display = 'flex';
     document.documentElement.classList.add('auth-locked');
-    setTimeout(()=>{ const f = ov.querySelector(offline ? '#auth_offline' : '#auth_email'); if(f) f.focus(); }, 30);
+    const first = offline ? '#auth_offline' : (show('email') ? '#auth_email' : '#auth_pass');
+    // foco imediato (um foco atrasado pode roubar o cursor de quem já começou a digitar)
+    const f = ov.querySelector(first); if(f) f.focus();
   }
   function hideLogin(){
     const ov = document.getElementById('auth_overlay');
@@ -431,6 +479,9 @@
       const res = await fetch('/api/auth/status', { credentials:'same-origin', cache:'no-store' });
       const d = await res.json();
       if(!res.ok || d.configured === false){ showLogin('O servidor ainda não foi configurado (falta AUTH_SECRET). Fale com quem administra o app.'); return; }
+      const tok = new URLSearchParams(location.search).get('reset');
+      if(tok && !d.setupNeeded){ resetToken = tok; showLogin('', 'reset'); return; }
+      if(tok) dropResetFromUrl();
       if(d.user) return loggedIn(d.user);
       showLogin('', d.setupNeeded ? 'setup' : 'login');
     }catch(_){
@@ -442,25 +493,41 @@
     const ov = authOverlay();
     const err = ov.querySelector('#auth_err');
     const btn = ov.querySelector('#auth_submit');
+    const ok = ov.querySelector('#auth_ok');
+    const m = AUTH_MODES[authMode];
     const email = ov.querySelector('#auth_email').value.trim();
     const password = ov.querySelector('#auth_pass').value;
-    err.textContent = '';
-    const body = { email, password };
-    if(authMode === 'setup'){
-      if(password !== ov.querySelector('#auth_pass2').value){ err.textContent = 'As senhas não conferem.'; return; }
-      body.setupKey = ov.querySelector('#auth_key').value;
+    err.textContent = ''; ok.textContent = '';
+    const body = {};
+    if(m.fields.includes('email')){
+      if(!email){ err.textContent = 'Informe o e-mail.'; return; }
+      body.email = email;
     }
+    if(m.fields.includes('pass')){
+      if(password.length < 10){ err.textContent = 'A senha precisa ter pelo menos 10 caracteres.'; return; }
+      body.password = password;
+    }
+    if(m.fields.includes('pass2') && password !== ov.querySelector('#auth_pass2').value){ err.textContent = 'As senhas não conferem.'; return; }
+    if(m.fields.includes('key')) body.setupKey = ov.querySelector('#auth_key').value;
+    if(authMode === 'reset') body.token = resetToken;
+    const endpoint = { login:'login', setup:'setup', forgot:'forgot', reset:'reset', resetkey:'reset-key' }[authMode];
     btn.disabled = true;
     try{
-      const res = await fetch('/api/auth/' + (authMode === 'setup' ? 'setup' : 'login'), {
+      const res = await fetch('/api/auth/' + endpoint, {
         method:'POST', credentials:'same-origin', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body)
       });
       const d = await res.json().catch(()=>({}));
       if(!res.ok){
         if(res.status === 409 && authMode === 'setup'){ showLogin(d.error, 'login'); return; }
+        if(res.status === 501 && authMode === 'forgot'){ showLogin(d.error, 'resetkey'); ov.querySelector('#auth_email').value = email; return; }
         err.textContent = d.error || ('Erro ' + res.status);
         return;
       }
+      if(authMode === 'forgot'){
+        ok.textContent = d.message || 'Se este e-mail tiver acesso, enviamos um link.';
+        return;
+      }
+      if(authMode === 'reset'){ resetToken = null; dropResetFromUrl(); }
       ov.querySelector('#auth_pass').value = '';
       const p2 = ov.querySelector('#auth_pass2'); if(p2) p2.value = '';
       const k = ov.querySelector('#auth_key'); if(k) k.value = '';
