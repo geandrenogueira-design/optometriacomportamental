@@ -15,7 +15,7 @@ public/                     app estático (index.html, ui.js, clinicalEngine.js,
 public/anamnese/            formulário dos pais (index.html) e definição das perguntas (schema.js)
 public/anamnese_admin.js    aba "Anamnese (pais)" do app
 public/ux.js                fluxo por etapas, salvamento automático, relatório e navegação
-functions/api/auth/         login: status, setup (primeira conta), login, logout
+functions/api/auth/         login: status, setup (primeira conta), login, logout, change (trocar senha), forgot/reset
 functions/api/user-data.js  sincronização dos pacientes (exige login)
 functions/api/migrate-kv.js migração única do KV da versão anterior (protegida, só leitura)
 functions/api/anamnese/     submit.js (pública: só recebe envios) e admin.js (protegida)
@@ -60,6 +60,8 @@ Essa chave assina as sessões e é pedida **uma única vez**, no primeiro acesso
 1. No cartão **Nuvem e backup**, confira se aparece o seu e-mail e o status "ok".
 2. Cadastre um paciente fictício. O status deve passar para "ok — salvo na nuvem".
 3. Abra o app em outro aparelho, entre com o mesmo e-mail e senha e confira se o paciente aparece.
+
+**Trocar a senha estando logado:** no cartão **Nuvem e backup**, clique em **Trocar senha**, informe a senha atual e a nova (duas vezes, mínimo de 10 caracteres). Não precisa de e-mail nem da chave de instalação.
 
 ### 6. Esqueci a senha (envio por e-mail)
 Na tela de entrar, **Esqueci a senha** envia um link de uso único, válido por 30 minutos. O envio usa o [Resend](https://resend.com) (plano gratuito, sem cartão):
