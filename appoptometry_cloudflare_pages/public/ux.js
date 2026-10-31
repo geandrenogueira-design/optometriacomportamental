@@ -15,12 +15,12 @@
     { tab:'tab_anamnese',        label:'Anamnese',          done:(p)=> !!(p.anamnese && p.anamnese.answers) },
     { tab:'tab_perfil',          label:'Queixa',            done:(p)=> !!(p.profile && (p.profile.main || p.profile.history)) },
     { tab:'tab_entrada',         label:'Entrada',           done:(p)=> !!(p.tests && p.tests.entrada) },
-    { tab:'tab_binocular',       label:'Vergência',         done:(p)=> !!(p.tests && p.tests.binocular) },
     { tab:'tab_visao_binocular', label:'Visão binocular',   done:(p)=> !!(p.tests && (p.tests.binocular_vision || p.tests.binocularVision)) },
-    { tab:'tab_nsuco',           label:'NSUCO',             done:(p)=> !!(p.tests && p.tests.nsuco) },
-    { tab:'tab_dem',             label:'DEM',               done:(p)=> !!(p.tests && p.tests.dem) },
     { tab:'tab_tvps',            label:'TVPS-4',            done:(p)=> !!(p.tests && p.tests.tvps4) },
     { tab:'tab_dtvp',            label:'DTVP-3',            done:(p)=> !!(p.tests && p.tests.dtvp3) },
+    { tab:'tab_binocular',       label:'Vergência',         done:(p)=> !!(p.tests && p.tests.binocular) },
+    { tab:'tab_nsuco',           label:'NSUCO',             done:(p)=> !!(p.tests && p.tests.nsuco) },
+    { tab:'tab_dem',             label:'DEM',               done:(p)=> !!(p.tests && p.tests.dem) },
   ];
   // Uma etapa marcada inteira como "não testado/não colaborou" também conta como resolvida.
   function stepState(p, st){
@@ -121,7 +121,7 @@
   }
 
   // ------------------------------------------------------------ botões −/+ nas listas numéricas
-  const STEP_TABS = ['tab_binocular','tab_visao_binocular','tab_nsuco','tab_dem','tab_tvps','tab_dtvp','tab_entrada'];
+  const STEP_TABS = ['tab_entrada','tab_visao_binocular','tab_tvps','tab_dtvp','tab_binocular','tab_nsuco','tab_dem'];
   function numericOptions(sel){
     const opts = Array.from(sel.options).filter((o)=> o.value !== '');
     if (opts.length < 3) return null;
@@ -170,7 +170,7 @@
   }
 
   // ------------------------------------------------------------ não testado / não colaborou
-  const CLINICAL = ['tab_entrada','tab_binocular','tab_visao_binocular','tab_nsuco','tab_dem','tab_tvps','tab_dtvp'];
+  const CLINICAL = ['tab_entrada','tab_visao_binocular','tab_tvps','tab_dtvp','tab_binocular','tab_nsuco','tab_dem'];
   const cardKey = (tab, card)=>{ const h = card.querySelector('h2'); return tab + '::' + (h ? h.textContent.replace(/[^\p{L}\p{N} /&—-]/gu, '').replace(/\s+/g, ' ').trim() : ''); };
   function enhanceCards(){
     CLINICAL.forEach((t)=>{
@@ -263,12 +263,12 @@
   }
   // Reaproveita os resumos que o próprio app já calcula em cada aba (mesmos valores e normas).
   const OUTS = [
-    ['tab_binocular','Vergência e acomodação','bin_out','binocular'],
     ['tab_visao_binocular','Visão binocular','bnv_out','binocular_vision'],
-    ['tab_nsuco','Oculomotricidade (NSUCO)','nsuco_out','nsuco'],
-    ['tab_dem','Sacádicos de leitura (DEM)','dem_out','dem'],
     ['tab_tvps','Percepção visual (TVPS-4)','tvps_out','tvps4'],
     ['tab_dtvp','Visuomotor e percepção (DTVP-3)','dtvp_out','dtvp3'],
+    ['tab_binocular','Vergência e acomodação','bin_out','binocular'],
+    ['tab_nsuco','Oculomotricidade (NSUCO)','nsuco_out','nsuco'],
+    ['tab_dem','Sacádicos de leitura (DEM)','dem_out','dem'],
   ];
   function cloneOut(id){
     const src = $(id); if (!src || !src.textContent.trim()) return '';
