@@ -112,7 +112,12 @@
   }
   function loadEntrada(p){
     const d = (p && p.tests && p.tests.entrada && p.tests.entrada.data) || {};
-    EN_FIELDS().forEach((e)=>{ e.value = d[e.id.slice(3)] != null ? d[e.id.slice(3)] : ''; });
+    EN_FIELDS().forEach((e)=>{
+      const val = d[e.id.slice(3)] != null ? String(d[e.id.slice(3)]) : '';
+      // Registros antigos têm texto livre (ex.: "20/20"). Se o valor não estiver na lista, cria a opção para não perder o dado.
+      if (e.tagName === 'SELECT' && val !== '' && !Array.from(e.options).some((o)=> o.value === val)) e.add(new Option(val, val));
+      e.value = val;
+    });
   }
 
   // ------------------------------------------------------------ botões −/+ nas listas numéricas
