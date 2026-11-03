@@ -77,6 +77,32 @@ export async function onRequestPost({ request, env, params }) {
 
   if (action === 'logout') return json({ ok: true }, 200, { 'Set-Cookie': clearCookie() });
 
+  if (action === 'change') {
+    // Troca de senha dentro do app: exige sessão ativa e a senha atual.
+    const sess = await readSession(request, env);
+    if (!sess) return json({ error: 'Sessão expirada. Entre de novo.' }, 401);
+    const cb = await body(request);
+    if (!cb) return json({ error: 'Dados inválidos.' }, 400);
+    const key = 'login:' + sess.email;
+    const lk = await lockState(env, key);
+    if (lk.locked_until > Date.now()) {
+      const min = Math.ceil((lk.locked_until - Date.now()) / 60000);
+      return json({ error: `Muitas tentativas. Tente de novo em ${min} min.` }, 429);
+    }
+    const np = String(cb.newPassword || '');
+    if (np.length < MIN_PASS) return json({ error: `A nova senha precisa ter pelo menos ${MIN_PASS} caracteres.` }, 400);
+    const u = await env.DB.prepare('SELECT pass_hash, salt FROM users WHERE email = ?').bind(sess.email).first();
+    if (!u) return json({ error: 'Conta não encontrada.' }, 404);
+    const h = await hashPassword(String(cb.currentPassword || ''), u.salt);
+    if (!safeEqual(h.hash, u.pass_hash)) {
+      const f = await registerFail(env, key);
+      return json({ error: 'Senha atual incorreta.' + (f.lockedMinutes ? ` Acesso bloqueado por ${f.lockedMinutes} min.` : '') }, 403);
+    }
+    await clearFails(env, key);
+    await setPassword(env, sess.email, np);
+    return json({ ok: true, user: sess.email }, 200, { 'Set-Cookie': await sessionCookie(env, sess.email) });
+  }
+
   const b = await body(request);
   if (!b) return json({ error: 'Dados inválidos.' }, 400);
   const email = String(b.email || '').trim().toLowerCase();

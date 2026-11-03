@@ -121,8 +121,16 @@
           <button id="btn_export_json" class="secondary">Exportar JSON</button>
           <button id="btn_import_json" class="secondary">Importar JSON</button>
           <button id="btn_migrate_kv" class="secondary" style="display:none">Trazer dados da versão anterior</button>
+          <button id="btn_chpass" class="secondary" style="display:none">Trocar senha</button>
           <button id="btn_logout" class="secondary" style="display:none">Sair</button>
         </div>
+        <form id="chpass_form" style="display:none;margin-top:10px;max-width:320px" autocomplete="off">
+          <label class="muted" style="font-size:12px">Senha atual<input type="password" id="cp_cur" autocomplete="current-password" style="width:100%"></label>
+          <label class="muted" style="font-size:12px">Nova senha (mínimo 10 caracteres)<input type="password" id="cp_new" autocomplete="new-password" style="width:100%"></label>
+          <label class="muted" style="font-size:12px">Repita a nova senha<input type="password" id="cp_new2" autocomplete="new-password" style="width:100%"></label>
+          <div style="margin-top:8px;display:flex;gap:8px"><button type="submit" class="secondary">Salvar nova senha</button><button type="button" id="cp_cancel" class="secondary">Cancelar</button></div>
+          <div id="cp_msg" class="muted" style="font-size:12px;margin-top:6px" role="status"></div>
+        </form>
         <input type="file" id="import_json_file" accept="application/json,.json" style="display:none">
         <div class="pill" style="margin-top:10px">Status: <span id="sync_status">—</span></div>
       `;
@@ -193,6 +201,7 @@
       if(u) u.textContent = remote.user || 'autenticado';
       const lo = document.getElementById('btn_logout');
       if(lo) lo.style.display = '';
+      const cpb2 = document.getElementById('btn_chpass'); if(cpb2) cpb2.style.display = '';
 
       const local = getLocalBundle();
       const remoteAt = Number(remote.updatedAt || 0);
@@ -354,6 +363,26 @@
       if(identityReady) await syncPush();
     });
     window.addEventListener('online', ()=>{ if(identityReady) syncPull(); });
+    const btnCp = document.getElementById('btn_chpass'), frmCp = document.getElementById('chpass_form');
+    if(btnCp && frmCp){
+      const msg = (t, ok)=>{ const m=document.getElementById('cp_msg'); m.textContent=t; m.style.color = ok ? '#1b7f3b' : '#b3261e'; };
+      btnCp.addEventListener('click', ()=>{ frmCp.style.display = frmCp.style.display==='none' ? '' : 'none'; msg('', true); document.getElementById('cp_cur').focus(); });
+      document.getElementById('cp_cancel').addEventListener('click', ()=>{ frmCp.reset(); frmCp.style.display='none'; });
+      frmCp.addEventListener('submit', async (ev)=>{
+        ev.preventDefault();
+        const cur=document.getElementById('cp_cur').value, n1=document.getElementById('cp_new').value, n2=document.getElementById('cp_new2').value;
+        if(n1.length < 10) return msg('A nova senha precisa ter pelo menos 10 caracteres.', false);
+        if(n1 !== n2) return msg('As duas senhas novas não são iguais.', false);
+        if(n1 === cur) return msg('A nova senha precisa ser diferente da atual.', false);
+        msg('Salvando…', true);
+        try{
+          const r = await fetch('/api/auth/change', { method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ currentPassword:cur, newPassword:n1 }) });
+          const d = await r.json().catch(()=>({}));
+          if(!r.ok) return msg(d.error || 'Não foi possível trocar a senha.', false);
+          frmCp.reset(); msg('Senha trocada. A antiga deixou de valer.', true);
+        }catch(_){ msg('Sem conexão. Tente de novo quando estiver online.', false); }
+      });
+    }
     const btnOut = document.getElementById('btn_logout');
     if(btnOut) btnOut.addEventListener('click', async ()=>{
       if(!window.confirm('Sair da conta neste aparelho? Os dados já sincronizados continuam na nuvem.')) return;
@@ -470,7 +499,7 @@
   function loggedIn(email){
     identityReady = true;
     const u = document.getElementById('sync_user'); if(u) u.textContent = email || 'autenticado';
-    const lo = document.getElementById('btn_logout'); if(lo) lo.style.display = '';
+    const lo = document.getElementById('btn_logout'); if(lo) lo.style.display = ''; const cpb = document.getElementById('btn_chpass'); if(cpb) cpb.style.display = '';
     hideLogin();
     syncPull();
   }
