@@ -1,4 +1,4 @@
-// Cloudflare Pages Function — GET/POST /api/user-data
+// Cloudflare Pages Function, GET/POST /api/user-data
 //
 // Autenticação: login próprio do app (cookie de sessão assinado; ver lib/auth.js).
 //

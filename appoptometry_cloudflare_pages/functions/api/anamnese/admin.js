@@ -1,4 +1,4 @@
-// /api/anamnese/admin — área do clínico (exige login no app).
+// /api/anamnese/admin, área do clínico (exige login no app).
 //   GET                 lista os links do usuário (sem as respostas)
 //   GET  ?code=XXX      um link com as respostas
 //   POST {action:'create', label, patientId?, days?}   gera um link novo

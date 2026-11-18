@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Questionário — Instituto Olhar</title>
+<title>Questionário · Instituto Olhar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -99,8 +99,8 @@
 </nav>
 
 <footer id="foot">
-  Instituto Olhar · Geandré Nogueira — Optometrista comportamental — CROO 1726<br>
-  Comercial Mauro Lima, sala 105 — Praça João Pessoa, 33, Centro, Garanhuns-PE · WhatsApp (87) 99936-0210
+  Instituto Olhar · Geandré Nogueira · Optometrista comportamental · CROO-PE 1726<br>
+  Comercial Mauro Lima, sala 105, Praça João Pessoa, 33, Centro, Garanhuns-PE · WhatsApp (87) 99936-0210
 </footer>
 
 <script src="schema.js"></script>
@@ -184,7 +184,7 @@
       }
       case 'scale': {
         const g = (v && typeof v === 'object') ? v : {};
-        return `<div class="card">${f.items.map(it=>`<div class="item" role="radiogroup" aria-label="${esc(it.t)}"><div class="t"><b>${it.n}</b>${esc(it.t)}${it.ask ? '<span class="ask">💬 Pergunte à criança</span>' : ''}</div><div class="scale">${
+        return `<div class="card">${f.items.map(it=>`<div class="item" role="radiogroup" aria-label="${esc(it.t)}"><div class="t"><b>${it.n}</b>${esc(it.t)}${it.ask ? '<span class="ask">Pergunte à criança</span>' : ''}</div><div class="scale">${
           S.scale.map(sc=>`<label><input type="radio" name="sint_${it.n}" data-scale="${f.id}" data-n="${it.n}" value="${sc.v}"${String(g[it.n])===String(sc.v)?' checked':''}><span>${esc(sc.label).replace('Raramente','Rara\u00ADmente').replace('Frequentemente','Frequen\u00ADte\u00ADmente')}</span></label>`).join('')}</div></div>`).join('')}</div>`;
       }
     }
@@ -199,7 +199,7 @@
     stepLabel.textContent = `Etapa ${step + 1} de ${steps}`;
     main.innerHTML = (step === 0 ? `<h1>${esc(S.title)}</h1>` : '') +
       `<h2>${esc(sec.title)}</h2>` + (sec.intro ? `<p class="intro">${esc(sec.intro)}</p>` : '') +
-      (sec.askNote ? `<div class="asknote"><b>💬 Pergunte à criança</b><br>${esc(sec.askNote)}</div>` : '') +
+      (sec.askNote ? `<div class="asknote"><b>Pergunte à criança</b><br>${esc(sec.askNote)}</div>` : '') +
       `<div class="${sec.fields.some(f=>f.type==='scale'||f.type==='grid'||f.type==='grid2') ? '' : 'card'}">${sec.fields.map(fieldHTML).join('')}</div>`;
     btnBack.disabled = step === 0;
     btnNext.textContent = step === steps - 1 ? 'Revisar e enviar' : 'Continuar';

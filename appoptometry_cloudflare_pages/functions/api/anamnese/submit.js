@@ -1,4 +1,4 @@
-// /api/anamnese/submit — rota pública da API (sem login): só recebe o envio dos pais.
+// /api/anamnese/submit, rota pública da API (sem login): só recebe o envio dos pais.
 // Os pais só conseguem: (1) verificar se um código é válido e (2) enviar as
 // respostas uma única vez. Não conseguem ler nada que já esteja guardado.
 import { json } from '../../../lib/auth.js';
