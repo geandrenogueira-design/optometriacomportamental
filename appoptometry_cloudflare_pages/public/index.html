@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Optometria comportamental — Instituto Olhar</title>
+  <title>Optometria comportamental · Instituto Olhar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
       --chart6:#ef4444;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(135deg,#ffffff,var(--bg));color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
     .app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
     aside{border-right:1px solid var(--line);background:rgba(255,255,255,.85);backdrop-filter: blur(10px);padding:14px}
     main{padding:16px}
@@ -102,16 +102,9 @@
 .btn-primary:hover{background:var(--primary2)}
 .dash-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .dash-card{border-radius:18px;padding:14px 14px 12px;color:#fff;box-shadow:0 14px 26px rgba(2,6,23,.12);position:relative;overflow:hidden;min-height:92px}
-.dash-card:before{content:"";position:absolute;inset:-40px;opacity:.18;background:radial-gradient(circle at 20% 10%, #fff 0%, transparent 45%)}
 .dash-card-k{font-size:12px;opacity:.92;letter-spacing:.3px}
 .dash-card-v{margin-top:8px;font-size:22px;font-weight:800;letter-spacing:.2px}
 .dash-card-s{margin-top:6px;font-size:12px;opacity:.88}
-.grad-pink{background:linear-gradient(135deg,#ef3b8b 0%,#7c3aed 95%)}
-.grad-purple{background:linear-gradient(135deg,#7c3aed 0%,#2563eb 95%)}
-.grad-blue{background:linear-gradient(135deg,#06b6d4 0%,#2563eb 95%)}
-.grad-orange{background:linear-gradient(135deg,#f59e0b 0%,#ef4444 95%)}
-    .grad-green{background:linear-gradient(135deg,#22c55e 0%,#0ea5e9 95%)}
-    .grad-slate{background:linear-gradient(135deg,#64748b 0%,#0f172a 95%)}
 
 .dash-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
 .dash-panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:14px}
@@ -150,7 +143,7 @@
 .comparison-table .highlight{background:rgba(245,158,11,.12);font-weight:600}
 
 /* =====================================================================
-   IDENTIDADE INSTITUTO OLHAR — camada visual (tema claro e escuro)
+   IDENTIDADE INSTITUTO OLHAR, camada visual (tema claro e escuro)
    Paleta: azul institucional #1e2d68 · marrom #8a5f3a / #c4966e · ciano #cde7f1 · cinza #cfd5d9
    Tipografia: Outfit. Texto em preto profundo no tema claro.
    ===================================================================== */
@@ -213,12 +206,12 @@ canvas{background:var(--surface);border-color:var(--line)}
 .toast{background:var(--surface);color:var(--text);border-color:var(--line);box-shadow:var(--shadow)}
 .dash-panel{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
 .dash-card{box-shadow:0 10px 22px rgba(30,45,104,.16)}
-.grad-pink{background:linear-gradient(135deg,#1e2d68 0%,#33489a 100%)}
-.grad-purple{background:linear-gradient(135deg,#27367a 0%,#4a5fae 100%)}
-.grad-blue{background:linear-gradient(135deg,#1e2d68 0%,#2f7fa8 100%)}
-.grad-orange{background:linear-gradient(135deg,#6f4a2b 0%,#a87b52 100%)}
-.grad-green{background:linear-gradient(135deg,#235a75 0%,#3d8fb5 100%)}
-.grad-slate{background:linear-gradient(135deg,#2b3247 0%,#1e2d68 100%)}
+.grad-pink{background:#1e2d68}
+.grad-purple{background:#33489a}
+.grad-blue{background:#235a75}
+.grad-orange{background:#6f4a2b}
+.grad-green{background:#28708f}
+.grad-slate{background:#2b3247}
 .summary-card{border-left-color:var(--accent);background:var(--panel2)}
 .comparison-table th{background:var(--panel2);color:var(--text)}
 .hint.info{color:var(--accent2)}
@@ -429,7 +422,6 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
     <div id="tab_perfil" class="tab">
       <div class="card">
         <h2>Queixa e história clínica</h2>
-        <div class="muted">Preencha e salve no prontuário do paciente selecionado.</div>
         <label>Queixa principal / motivo</label>
         <textarea id="q_main" placeholder="Ex.: dificuldade de leitura, dor de cabeça, perde linha..."></textarea>
 
@@ -450,8 +442,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
     <div id="tab_tvps" class="tab">
       <div class="card">
-        <h2>TVPS-4 — Percepção visual (bruto → escalonado → padrão e idade equivalente)</h2>
-        <div class="muted">Entradas por lista (sem digitação livre).</div>
+        <h2>TVPS-4: Percepção visual (bruto → escalonado → padrão e idade equivalente)</h2>
 
         <div class="row row3">
           <div>
@@ -505,8 +496,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
     <div id="tab_dem" class="tab">
       <div class="card">
-        <h2>DEM — Sacádicos de leitura (tempos, erros e escore z)</h2>
-        <div class="muted">Sem digitação livre. Use a lista e calcule.</div>
+        <h2>DEM: Sacádicos de leitura (tempos, erros e escore z)</h2>
 
         <div class="row row3">
           <div>
@@ -539,7 +529,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
     <div id="tab_dtvp" class="tab">
       <div class="card">
-        <h2>DTVP-3 — Teste de Percepção Visual <span id="dtvp_progress" class="progress-badge progress-partial">0% preenchido</span></h2>
+        <h2>DTVP-3: Teste de Percepção Visual <span id="dtvp_progress" class="progress-badge progress-partial">0% preenchido</span></h2>
         <div class="muted">Developmental Test of Visual Perception (3ª edição). Avalia percepção motora e visual-perceptiva.</div>
       </div>
 
@@ -587,7 +577,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
       <div class="card">
         <div class="btnRow">
           <button id="btn_dtvp_calcular">Calcular</button>
-          <button id="btn_dtvp_copy_whatsapp" class="secondary">📋 Copiar p/ WhatsApp</button>
+          <button id="btn_dtvp_copy_whatsapp" class="secondary">Copiar p/ WhatsApp</button>
           <button id="btn_dtvp_limpar" class="secondary">Limpar</button>
           <button id="btn_dtvp_salvar">Salvar no paciente</button>
         </div>
@@ -598,7 +588,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
     <div id="tab_nsuco" class="tab">
       <div class="card">
-        <h2>NSUCO — Seguimentos e sacádicos</h2>
+        <h2>NSUCO: Seguimentos e sacádicos</h2>
         <div class="muted">Pontuação 1–5. Salva no paciente e mostra resumo. (cabeça/corpo combinado = o pior dos dois)</div>
 
         <h3 style="margin:10px 0 6px 0">Seguimentos (pursuits)</h3>
@@ -666,19 +656,18 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
     <div id="tab_binocular" class="tab">
       <div class="card">
         <h2>Vergência &amp; Acomodação <span id="bin_progress" class="progress-badge progress-partial">0% preenchido</span></h2>
-        <div class="muted">Preencha os campos e veja comparação com normas em tempo real.</div>
       </div>
 
       <div class="card">
         <h2>Cover Test / Forias</h2>
         <div class="row row3">
           <div class="field-validated">
-            <label>Foria Longe (Δ) — exo + / eso −</label>
+            <label>Foria Longe (Δ): exo + / eso −</label>
             <select id="bin_cover_distance" onchange="validateBinocularField('bin_cover_distance')"></select>
             <span id="bin_cover_distance_hint" class="hint"></span>
           </div>
           <div class="field-validated">
-            <label>Foria Perto (Δ) — exo + / eso −</label>
+            <label>Foria Perto (Δ): exo + / eso −</label>
             <select id="bin_cover_near" onchange="validateBinocularField('bin_cover_near')"></select>
             <span id="bin_cover_near_hint" class="hint"></span>
           </div>
@@ -704,7 +693,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         </div>
 
         <div class="muted small" style="margin-top:6px">
-          <strong>Convenção de sinal:</strong> na fórmula clínica <span class="mono">eso = +</span> e <span class="mono">exo = −</span>. No app (menus), <span class="mono">exo = +</span> e <span class="mono">eso = −</span> — o sistema converte automaticamente para calcular.
+          <strong>Convenção de sinal:</strong> na fórmula clínica <span class="mono">eso = +</span> e <span class="mono">exo = −</span>. No app (menus), <span class="mono">exo = +</span> e <span class="mono">eso = −</span>. O sistema converte automaticamente para calcular.
           <div style="margin-top:4px">
             <span class="mono">AC/A (calculada) = IPD(cm) + NFD(m) × (Hn − Hf)</span>
           </div>
@@ -712,12 +701,12 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
         <div class="row row2" style="margin-top:10px">
           <div class="field-validated">
-            <label>Foria perto com −1.00 D (Δ) — exo + / eso −</label>
+            <label>Foria perto com −1.00 D (Δ): exo + / eso −</label>
             <select id="bin_grad_near_m1" onchange="updateAllACA()"></select>
             <span id="bin_grad_near_m1_hint" class="hint"></span>
           </div>
           <div class="field-validated">
-            <label>Foria perto com −2.00 D (Δ) — exo + / eso −</label>
+            <label>Foria perto com −2.00 D (Δ): exo + / eso −</label>
             <select id="bin_grad_near_m2" onchange="updateAllACA()"></select>
             <span id="bin_grad_near_m2_hint" class="hint"></span>
           </div>
@@ -752,30 +741,30 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h3 style="margin:10px 0 6px 0;font-size:14px">Base Out (Divergência)</h3>
         <div class="row row3">
           <div class="field-validated">
-            <label>BO Longe — Embaçamento (Δ)</label>
+            <label>BO Longe: Embaçamento (Δ)</label>
             <select id="bin_bo_d_blur"></select>
           </div>
           <div class="field-validated">
-            <label>BO Longe — Ruptura (Δ)</label>
+            <label>BO Longe: Ruptura (Δ)</label>
             <select id="bin_bo_d_break"></select>
           </div>
           <div>
-            <label>BO Longe — Recuperação (Δ)</label>
+            <label>BO Longe: Recuperação (Δ)</label>
             <select id="bin_bo_d_recovery"></select>
           </div>
         </div>
         <div class="row row3">
           <div class="field-validated">
-            <label>BO Perto — Embaçamento (Δ)</label>
+            <label>BO Perto: Embaçamento (Δ)</label>
             <select id="bin_bo_n_blur"></select>
           </div>
           <div class="field-validated">
-            <label>BO Perto — Ruptura (Δ)</label>
+            <label>BO Perto: Ruptura (Δ)</label>
             <select id="bin_bo_n_break" onchange="validateBinocularField('bin_bo_n_break')"></select>
             <span id="bin_bo_n_break_hint" class="hint"></span>
           </div>
           <div>
-            <label>BO Perto — Recuperação (Δ)</label>
+            <label>BO Perto: Recuperação (Δ)</label>
             <select id="bin_bo_n_recovery"></select>
           </div>
         </div>
@@ -783,26 +772,26 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h3 style="margin:10px 0 6px 0;font-size:14px">Base In (Convergência)</h3>
         <div class="row row3">
           <div>
-            <label>BI Longe — Ruptura (Δ)</label>
+            <label>BI Longe: Ruptura (Δ)</label>
             <select id="bin_bi_d_break"></select>
           </div>
           <div>
-            <label>BI Longe — Recuperação (Δ)</label>
+            <label>BI Longe: Recuperação (Δ)</label>
             <select id="bin_bi_d_recovery"></select>
           </div>
           <div></div>
         </div>
         <div class="row row3">
           <div>
-            <label>BI Perto — Embaçamento (Δ)</label>
+            <label>BI Perto: Embaçamento (Δ)</label>
             <select id="bin_bi_n_blur"></select>
           </div>
           <div>
-            <label>BI Perto — Ruptura (Δ)</label>
+            <label>BI Perto: Ruptura (Δ)</label>
             <select id="bin_bi_n_break"></select>
           </div>
           <div>
-            <label>BI Perto — Recuperação (Δ)</label>
+            <label>BI Perto: Recuperação (Δ)</label>
             <select id="bin_bi_n_recovery"></select>
           </div>
         </div>
@@ -815,22 +804,22 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h3 style="margin:10px 0 6px 0;font-size:14px">Criança (7–12 anos)</h3>
         <div class="row row3">
           <div>
-            <label>BO Perto — Ruptura (Δ)</label>
+            <label>BO Perto: Ruptura (Δ)</label>
             <select id="bin_step_child_bo_n_break"></select>
           </div>
           <div>
-            <label>BO Perto — Recuperação (Δ)</label>
+            <label>BO Perto: Recuperação (Δ)</label>
             <select id="bin_step_child_bo_n_recovery"></select>
           </div>
           <div></div>
         </div>
         <div class="row row3">
           <div>
-            <label>BI Perto — Ruptura (Δ)</label>
+            <label>BI Perto: Ruptura (Δ)</label>
             <select id="bin_step_child_bi_n_break"></select>
           </div>
           <div>
-            <label>BI Perto — Recuperação (Δ)</label>
+            <label>BI Perto: Recuperação (Δ)</label>
             <select id="bin_step_child_bi_n_recovery"></select>
           </div>
           <div></div>
@@ -839,44 +828,44 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h3 style="margin:14px 0 6px 0;font-size:14px">Adulto (≥13 anos)</h3>
         <div class="row row3">
           <div>
-            <label>BO Longe — Ruptura (Δ)</label>
+            <label>BO Longe: Ruptura (Δ)</label>
             <select id="bin_step_adult_bo_d_break"></select>
           </div>
           <div>
-            <label>BO Longe — Recuperação (Δ)</label>
+            <label>BO Longe: Recuperação (Δ)</label>
             <select id="bin_step_adult_bo_d_recovery"></select>
           </div>
           <div></div>
         </div>
         <div class="row row3">
           <div>
-            <label>BI Longe — Ruptura (Δ)</label>
+            <label>BI Longe: Ruptura (Δ)</label>
             <select id="bin_step_adult_bi_d_break"></select>
           </div>
           <div>
-            <label>BI Longe — Recuperação (Δ)</label>
+            <label>BI Longe: Recuperação (Δ)</label>
             <select id="bin_step_adult_bi_d_recovery"></select>
           </div>
           <div></div>
         </div>
         <div class="row row3">
           <div>
-            <label>BO Perto — Ruptura (Δ)</label>
+            <label>BO Perto: Ruptura (Δ)</label>
             <select id="bin_step_adult_bo_n_break"></select>
           </div>
           <div>
-            <label>BO Perto — Recuperação (Δ)</label>
+            <label>BO Perto: Recuperação (Δ)</label>
             <select id="bin_step_adult_bo_n_recovery"></select>
           </div>
           <div></div>
         </div>
         <div class="row row3">
           <div>
-            <label>BI Perto — Ruptura (Δ)</label>
+            <label>BI Perto: Ruptura (Δ)</label>
             <select id="bin_step_adult_bi_n_break"></select>
           </div>
           <div>
-            <label>BI Perto — Recuperação (Δ)</label>
+            <label>BI Perto: Recuperação (Δ)</label>
             <select id="bin_step_adult_bi_n_recovery"></select>
           </div>
           <div></div>
@@ -887,11 +876,11 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h2>Flexibilidade Vergencial</h2>
         <div class="row row2">
           <div>
-            <label>Perto — 12BO/3BI (cpm)</label>
+            <label>Perto: 12BO/3BI (cpm)</label>
             <select id="bin_vf_near_cpm"></select>
           </div>
           <div>
-            <label>Longe — 12BO/3BI (cpm)</label>
+            <label>Longe: 12BO/3BI (cpm)</label>
             <select id="bin_vf_distance_cpm"></select>
           </div>
         </div>
@@ -901,22 +890,22 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h2>Ponto Próximo de Convergência (PPC)</h2>
         <div class="row row2">
           <div class="field-validated">
-            <label>Alvo acomodativo — Ruptura (cm)</label>
+            <label>Alvo acomodativo: Ruptura (cm)</label>
             <select id="bin_npc_break" onchange="validateBinocularField('bin_npc_break')"></select>
             <span id="bin_npc_break_hint" class="hint"></span>
           </div>
           <div>
-            <label>Alvo acomodativo — Recuperação (cm)</label>
+            <label>Alvo acomodativo: Recuperação (cm)</label>
             <select id="bin_npc_recovery"></select>
           </div>
         </div>
         <div class="row row2">
           <div>
-            <label>Caneta + V/V — Ruptura (cm)</label>
+            <label>Caneta + V/V: Ruptura (cm)</label>
             <select id="bin_npc_rg_break"></select>
           </div>
           <div>
-            <label>Caneta + V/V — Recuperação (cm)</label>
+            <label>Caneta + V/V: Recuperação (cm)</label>
             <select id="bin_npc_rg_recovery"></select>
           </div>
         </div>
@@ -926,12 +915,12 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h2>Amplitude Acomodativa</h2>
         <div class="row row2">
           <div class="field-validated">
-            <label>AA — Push-up (D)</label>
+            <label>AA: Push-up (D)</label>
             <select id="bin_aa" onchange="validateBinocularField('bin_aa')"></select>
             <span id="bin_aa_hint" class="hint"></span>
           </div>
           <div>
-            <label>AA — Minus lens (D)</label>
+            <label>AA: Minus lens (D)</label>
             <select id="bin_aa_minus"></select>
           </div>
         </div>
@@ -941,11 +930,11 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h2>Flexibilidade Acomodativa</h2>
         <div class="row row2">
           <div>
-            <label>MAF — Monocular (cpm)</label>
+            <label>MAF: Monocular (cpm)</label>
             <select id="bin_maf"></select>
           </div>
           <div>
-            <label>BAF — Binocular (cpm)</label>
+            <label>BAF: Binocular (cpm)</label>
             <select id="bin_af"></select>
           </div>
         </div>
@@ -955,21 +944,21 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <h2>Testes Complementares de Acomodação</h2>
         <div class="row row2">
           <div>
-            <label>MEM — Retinoscopia estimativa (D)</label>
+            <label>MEM: Retinoscopia estimativa (D)</label>
             <select id="bin_mem"></select>
           </div>
           <div>
-            <label>FCC — Cilindro cruzado fundido (D)</label>
+            <label>FCC: Cilindro cruzado fundido (D)</label>
             <select id="bin_fcc"></select>
           </div>
         </div>
         <div class="row row2">
           <div>
-            <label>NRA — Acomodação relativa negativa (D)</label>
+            <label>NRA: Acomodação relativa negativa (D)</label>
             <select id="bin_nra"></select>
           </div>
           <div>
-            <label>PRA — Acomodação relativa positiva (D)</label>
+            <label>PRA: Acomodação relativa positiva (D)</label>
             <select id="bin_pra"></select>
           </div>
         </div>
@@ -978,7 +967,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
       <div class="card">
         <div class="btnRow">
           <button id="btn_binocular_salvar">Salvar no paciente</button>
-          <button id="btn_binocular_copy_whatsapp" class="secondary">📋 Copiar p/ WhatsApp</button>
+          <button id="btn_binocular_copy_whatsapp" class="secondary">Copiar p/ WhatsApp</button>
           <button id="btn_binocular_ver_json" class="secondary">Ver JSON</button>
         </div>
       </div>
@@ -988,7 +977,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
     <div id="tab_visao_binocular" class="tab">
       <div class="card">
-        <h2>Visão binocular — Worth 4 Dot + Estereopsia</h2>
+        <h2>Visão binocular: Worth 4 Dot + Estereopsia</h2>
         <div class="muted">Registro clínico + referências (não inventa valores; regras simples quando aplicável).</div>
 
         <div style="margin-top:10px;font-weight:600">Worth 4 Dot</div>
@@ -1012,7 +1001,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
             <select id="bnv_titmus_fly"></select>
           </div>
           <div>
-            <label>Titmus — círculos (arcseg)</label>
+            <label>Titmus: círculos (arcseg)</label>
             <select id="bnv_titmus_circles"></select>
           </div>
           <div>
@@ -1110,7 +1099,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
         <div class="dash-grid">
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">NSUCO — Radar</div>
+              <div class="dash-panel-title">NSUCO: Radar</div>
               <div class="dash-panel-sub" id="dash_nsuco_meta">Seguimentos × Sacádicos • Alvo 4</div>
             </div>
             <canvas id="panel_nsuco_radar" width="720" height="380"></canvas>
@@ -1118,7 +1107,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">TVPS-4 — Perfil (Scaled)</div>
+              <div class="dash-panel-title">TVPS-4: Perfil (Scaled)</div>
               <div class="dash-panel-sub">7 subtestes • escala 1–19</div>
             </div>
             <canvas id="panel_tvps_chart" width="720" height="320"></canvas>
@@ -1126,7 +1115,7 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
 
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">DTVP-3 — Perfil (Scaled)</div>
+              <div class="dash-panel-title">DTVP-3: Perfil (Scaled)</div>
               <div class="dash-panel-sub">5 subtestes • escala 1–19</div>
             </div>
             <canvas id="panel_dtvp_chart" width="720" height="320"></canvas>
@@ -1135,7 +1124,6 @@ table.qxa th,table.qxa td,table.rp-t th,table.rp-t td{padding:7px 8px;border-bot
           <div class="dash-panel">
             <div class="dash-panel-head">
               <div class="dash-panel-title">Resumo estruturado (para copiar)</div>
-              <div class="dash-panel-sub">Clique em <b>Copiar</b> para enviar à equipe.</div>
             </div>
             <div class="out" id="panel_integrado"></div>
           </div>

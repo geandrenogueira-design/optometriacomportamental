@@ -1,4 +1,4 @@
-// Anamnese Olhar — questionário para pais ou responsáveis.
+// Anamnese Olhar, questionário para pais ou responsáveis.
 // Instrumento próprio do Instituto Olhar: estrutura de anamnese do desenvolvimento
 // + checklist de sinais e sintomas com escala de frequência de 5 pontos (0–4).
 //
@@ -319,7 +319,7 @@
       },
     ],
 
-    // Domínios do checklist (agrupamento clínico do Instituto Olhar — revisável).
+    // Domínios do checklist (agrupamento clínico do Instituto Olhar, revisável).
     // Cada item pertence a um só domínio. O app relaciona cada domínio ao teste que o investiga.
     domains: [
       { id: 'leitura', label: 'Leitura e eficiência', items: [2, 3, 4, 5, 6, 13, 15, 25], tests: 'DEM' },

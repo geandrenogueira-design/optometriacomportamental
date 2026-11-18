@@ -210,7 +210,7 @@
 
   function demAgeKey(y, m){
     // dem norms keys like "6.0-6.11"
-    // Normas publicadas: 6a0m a 13a11m. Fora disso não há referência — não extrapolar.
+    // Normas publicadas: 6a0m a 13a11m. Fora disso não há referência, não extrapolar.
     if(!Number.isFinite(y) || y < 6 || y > 13) return null;
     return `${y}.0-${y}.11`;
   }

@@ -163,7 +163,7 @@
   function handleSyncError(e, label){
     if(e && e.session){
       identityReady = false;
-      setSyncStatus('sessão expirada — entre de novo');
+      setSyncStatus('sessão expirada, entre de novo');
       showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
       return;
     }
@@ -180,7 +180,7 @@
       const { res, data: remote } = await apiFetch('GET');
       if(res.status === 401 || res.status === 403){
         identityReady = false;
-        setSyncStatus('não autenticado — entre de novo');
+        setSyncStatus('não autenticado, entre de novo');
         showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
         return;
       }
@@ -237,7 +237,7 @@
       }
       if(res.status === 401 || res.status === 403){
         identityReady = false;
-        setSyncStatus('não autenticado — entre de novo');
+        setSyncStatus('não autenticado, entre de novo');
         showLogin('Sua sessão expirou. Entre de novo para sincronizar.');
         return;
       }
@@ -245,7 +245,7 @@
         setSyncStatus('erro (' + res.status + ')' + (data && data.error ? ': ' + data.error : ''));
         return;
       }
-      setSyncStatus('ok — salvo na nuvem');
+      setSyncStatus('ok, salvo na nuvem');
     }catch(e){
       handleSyncError(e, 'syncPush');
     }
@@ -344,7 +344,7 @@
 
     if(isLocalOnly()){
       if(btnSync) btnSync.style.display = 'none';
-      setSyncStatus('modo local — dados só neste navegador');
+      setSyncStatus('modo local: dados só neste navegador');
       return;
     }
     const btnMig = document.getElementById('btn_migrate_kv');
@@ -406,7 +406,7 @@
       </div>`;
     document.body.appendChild(ov);
     ov.querySelector('#auth_form').addEventListener('submit', submitAuth);
-    ov.querySelector('#auth_offline').addEventListener('click', ()=>{ hideLogin(); setSyncStatus('sem internet — dados só neste aparelho'); });
+    ov.querySelector('#auth_offline').addEventListener('click', ()=>{ hideLogin(); setSyncStatus('sem internet: dados só neste aparelho'); });
     ov.querySelector('#auth_go_forgot').addEventListener('click', ()=> showLogin('', 'forgot'));
     ov.querySelector('#auth_go_resetkey').addEventListener('click', ()=> showLogin('', 'resetkey'));
     ov.querySelector('#auth_go_login').addEventListener('click', ()=>{
@@ -591,7 +591,7 @@
         <div class="dash-grid">
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">NSUCO — Radar</div>
+              <div class="dash-panel-title">NSUCO: Radar</div>
               <div class="dash-panel-sub" id="dash_nsuco_meta">Seguimentos × Sacádicos • Alvo 4</div>
             </div>
             <canvas id="panel_nsuco_radar" width="720" height="380"></canvas>
@@ -599,7 +599,7 @@
 
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">TVPS-4 — Perfil (Scaled)</div>
+              <div class="dash-panel-title">TVPS-4: Perfil (Scaled)</div>
               <div class="dash-panel-sub">7 subtestes • escala 1–19</div>
             </div>
             <canvas id="panel_tvps_chart" width="720" height="320"></canvas>
@@ -607,7 +607,7 @@
 
           <div class="dash-panel">
             <div class="dash-panel-head">
-              <div class="dash-panel-title">DTVP-3 — Perfil (Scaled)</div>
+              <div class="dash-panel-title">DTVP-3: Perfil (Scaled)</div>
               <div class="dash-panel-sub">5 subtestes • escala 1–19</div>
             </div>
             <canvas id="panel_dtvp_chart" width="720" height="320"></canvas>
@@ -616,7 +616,6 @@
           <div class="dash-panel">
             <div class="dash-panel-head">
               <div class="dash-panel-title">Resumo estruturado (para copiar)</div>
-              <div class="dash-panel-sub">Clique em <b>Copiar</b> para enviar à equipe.</div>
             </div>
             <div class="out" id="panel_integrado"></div>
           </div>
@@ -633,7 +632,7 @@
       // Recreate minimal binocular vision form if markup got removed/corrupted
       tab.innerHTML = `
         <div class="card">
-          <h2>Visão binocular — Worth 4 Dot + Estereopsia</h2>
+          <h2>Visão binocular: Worth 4 Dot + Estereopsia</h2>
           <div class="muted">Registro clínico + referências (não inventa valores).</div>
 
           <div style="margin-top:10px;font-weight:600">Worth 4 Dot</div>
@@ -657,7 +656,7 @@
               <select id="bnv_titmus_fly"></select>
             </div>
             <div>
-              <label>Titmus — círculos (arcseg)</label>
+              <label>Titmus: círculos (arcseg)</label>
               <select id="bnv_titmus_circles"></select>
             </div>
             <div>
@@ -1212,7 +1211,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
     const b3line = out.derived ? `Scaled (B.3): ${escapeHtml(String(d.ScaledComposite ?? '—'))} • NCE: ${escapeHtml(String(d.NCE ?? '—'))} • T-score: ${escapeHtml(String(d.T ?? '—'))} • Stanine: ${escapeHtml(String(d.Stanine ?? '—'))} • Percentil: ${escapeHtml(String(d.Percentile ?? '—'))}` : '—';
 
     const totalAgeEqMeanLine = (computedMean === null || computedMean === undefined)
-      ? '— (requer 7 Age Eq em y-m; aceita < / >)'
+      ? '(requer 7 Age Eq em y-m; aceita < / >)'
       : escapeHtml(String(computedMean));
 
     const ageEqMeanUsesBounds = (typeof computedMean === 'string' && computedMean.endsWith('*'));
@@ -1674,7 +1673,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
           </div>`;
         }).join('');
         return `<div style="margin-top:8px">
-          <div style="font-weight:600;margin-bottom:4px">${escapeHtml(label)} — norma mínima (${escapeHtml(ageKey)}a, ${escapeHtml(sex)})</div>
+          <div style="font-weight:600;margin-bottom:4px">${escapeHtml(label)}: norma mínima (${escapeHtml(ageKey)}a, ${escapeHtml(sex)})</div>
           <div class="row small" style="grid-template-columns:0.9fr 0.4fr 0.4fr 0.5fr;gap:8px;margin-bottom:4px;opacity:.8">
             <div class="k">Item</div><div class="k">Escore</div><div class="k">Mín</div><div class="k">Status</div>
           </div>
@@ -1851,7 +1850,7 @@ function setHTML(id, html){ const n=el(id); if(n) n.innerHTML = html; }
       });
     }
 
-    // AC/A calculada (heteroforia) — atualiza ao editar
+    // AC/A calculada (heteroforia), atualiza ao editar
     ['bin_pd_mm','bin_work_cm'].forEach(id=>{
       const t = el(id);
       if(t) t.addEventListener('input', updateAcaCalculated);
@@ -2105,7 +2104,7 @@ function saveBinocular(){
       html += normLine('AC/A', fmtNum(aca,1), normStr, '—');
     }
 
-    // AC/A calculada (heteroforia) — se registrado
+    // AC/A calculada (heteroforia), se registrado
     const acaCalc = data.aca_calc;
     if(acaCalc !== undefined){
       const pd = data.pd_mm;
@@ -2125,21 +2124,21 @@ function saveBinocular(){
       const normStr = (mean!=null && sd!=null) ? `média ${mean} • DP ±${sd}` : 'Sem norma';
       html += normLine(label, fmtNum(v,0), normStr, (mean!=null && sd!=null) ? renderZ(v, mean, sd) : '—');
     }
-    smooth('bo_d_blur','base_out_distance','blur','BO Longe — Embaçamento');
-    smooth('bo_d_break','base_out_distance','break','BO Longe — Ruptura');
-    smooth('bo_d_recovery','base_out_distance','recovery','BO Longe — Recuperação');
+    smooth('bo_d_blur','base_out_distance','blur','BO Longe: Embaçamento');
+    smooth('bo_d_break','base_out_distance','break','BO Longe: Ruptura');
+    smooth('bo_d_recovery','base_out_distance','recovery','BO Longe: Recuperação');
 
     // BI Longe não tem "blur" na tabela
-    smooth('bi_d_break','base_in_distance','break','BI Longe — Ruptura');
-    smooth('bi_d_recovery','base_in_distance','recovery','BI Longe — Recuperação');
+    smooth('bi_d_break','base_in_distance','break','BI Longe: Ruptura');
+    smooth('bi_d_recovery','base_in_distance','recovery','BI Longe: Recuperação');
 
-    smooth('bo_n_blur','base_out_near','blur','BO Perto — Embaçamento');
-    smooth('bo_n_break','base_out_near','break','BO Perto — Ruptura');
-    smooth('bo_n_recovery','base_out_near','recovery','BO Perto — Recuperação');
+    smooth('bo_n_blur','base_out_near','blur','BO Perto: Embaçamento');
+    smooth('bo_n_break','base_out_near','break','BO Perto: Ruptura');
+    smooth('bo_n_recovery','base_out_near','recovery','BO Perto: Recuperação');
 
-    smooth('bi_n_blur','base_in_near','blur','BI Perto — Embaçamento');
-    smooth('bi_n_break','base_in_near','break','BI Perto — Ruptura');
-    smooth('bi_n_recovery','base_in_near','recovery','BI Perto — Recuperação');
+    smooth('bi_n_blur','base_in_near','blur','BI Perto: Embaçamento');
+    smooth('bi_n_break','base_in_near','break','BI Perto: Ruptura');
+    smooth('bi_n_recovery','base_in_near','recovery','BI Perto: Recuperação');
 
     // Step vergence
     const stepMode = (ageY!==null && ageY>=13) ? 'adults' : ((ageY!==null && ageY>=7 && ageY<=12) ? 'children_7_12' : null);
@@ -2155,16 +2154,16 @@ function saveBinocular(){
     }
 
     // We allow saving either child or adult fields; show norms based on age group when available.
-    step('Step — BO Perto Ruptura', (stepMode==='children_7_12')?'step_child_bo_n_break':'step_adult_bo_n_break', ['base_out_near','break']);
-    step('Step — BO Perto Recuperação', (stepMode==='children_7_12')?'step_child_bo_n_recovery':'step_adult_bo_n_recovery', ['base_out_near','recovery']);
-    step('Step — BI Perto Ruptura', (stepMode==='children_7_12')?'step_child_bi_n_break':'step_adult_bi_n_break', ['base_in_near','break']);
-    step('Step — BI Perto Recuperação', (stepMode==='children_7_12')?'step_child_bi_n_recovery':'step_adult_bi_n_recovery', ['base_in_near','recovery']);
+    step('Step: BO Perto Ruptura', (stepMode==='children_7_12')?'step_child_bo_n_break':'step_adult_bo_n_break', ['base_out_near','break']);
+    step('Step: BO Perto Recuperação', (stepMode==='children_7_12')?'step_child_bo_n_recovery':'step_adult_bo_n_recovery', ['base_out_near','recovery']);
+    step('Step: BI Perto Ruptura', (stepMode==='children_7_12')?'step_child_bi_n_break':'step_adult_bi_n_break', ['base_in_near','break']);
+    step('Step: BI Perto Recuperação', (stepMode==='children_7_12')?'step_child_bi_n_recovery':'step_adult_bi_n_recovery', ['base_in_near','recovery']);
 
     if(stepMode==='adults'){
-      step('Step — BO Longe Ruptura','step_adult_bo_d_break',['base_out_distance','break']);
-      step('Step — BO Longe Recuperação','step_adult_bo_d_recovery',['base_out_distance','recovery']);
-      step('Step — BI Longe Ruptura','step_adult_bi_d_break',['base_in_distance','break']);
-      step('Step — BI Longe Recuperação','step_adult_bi_d_recovery',['base_in_distance','recovery']);
+      step('Step: BO Longe Ruptura','step_adult_bo_d_break',['base_out_distance','break']);
+      step('Step: BO Longe Recuperação','step_adult_bo_d_recovery',['base_out_distance','recovery']);
+      step('Step: BI Longe Ruptura','step_adult_bi_d_break',['base_in_distance','break']);
+      step('Step: BI Longe Recuperação','step_adult_bi_d_recovery',['base_in_distance','recovery']);
     }
 
     // Vergence facility (cpm)
@@ -2186,25 +2185,25 @@ function saveBinocular(){
     if(npcB !== undefined){
       const n = N.facility_and_npc?.npc_accommodative_target?.break_cm;
       const normStr = n ? `média ${n.mean} cm • DP ±${n.sd}` : 'Sem norma';
-      html += normLine('PPC (alvo acomodativo) — Ruptura', fmtNum(npcB,1)+' cm', normStr, n ? renderZ(npcB, n.mean, n.sd) : '—');
+      html += normLine('PPC (alvo acomodativo): Ruptura', fmtNum(npcB,1)+' cm', normStr, n ? renderZ(npcB, n.mean, n.sd) : '—');
     }
     const npcR = data.npc_recovery;
     if(npcR !== undefined){
       const n = N.facility_and_npc?.npc_accommodative_target?.recovery_cm;
       const normStr = n ? `média ${n.mean} cm • DP ±${n.sd}` : 'Sem norma';
-      html += normLine('PPC (alvo acomodativo) — Recuperação', fmtNum(npcR,1)+' cm', normStr, n ? renderZ(npcR, n.mean, n.sd) : '—');
+      html += normLine('PPC (alvo acomodativo): Recuperação', fmtNum(npcR,1)+' cm', normStr, n ? renderZ(npcR, n.mean, n.sd) : '—');
     }
     const npcRgb = data.npc_rg_break;
     if(npcRgb !== undefined){
       const n = N.facility_and_npc?.npc_penlight_rg?.break_cm;
       const normStr = n ? `média ${n.mean} cm • DP ±${n.sd}` : 'Sem norma';
-      html += normLine('PPC (caneta + V/V) — Ruptura', fmtNum(npcRgb,1)+' cm', normStr, n ? renderZ(npcRgb, n.mean, n.sd) : '—');
+      html += normLine('PPC (caneta + V/V): Ruptura', fmtNum(npcRgb,1)+' cm', normStr, n ? renderZ(npcRgb, n.mean, n.sd) : '—');
     }
     const npcRgr = data.npc_rg_recovery;
     if(npcRgr !== undefined){
       const n = N.facility_and_npc?.npc_penlight_rg?.recovery_cm;
       const normStr = n ? `média ${n.mean} cm • DP ±${n.sd}` : 'Sem norma';
-      html += normLine('PPC (caneta + V/V) — Recuperação', fmtNum(npcRgr,1)+' cm', normStr, n ? renderZ(npcRgr, n.mean, n.sd) : '—');
+      html += normLine('PPC (caneta + V/V): Recuperação', fmtNum(npcRgr,1)+' cm', normStr, n ? renderZ(npcRgr, n.mean, n.sd) : '—');
     }
 
     // AA
@@ -2219,9 +2218,9 @@ function saveBinocular(){
         const sd = n.sd_diopters;
         const belowMin = (Number.isFinite(minimum) && aa < minimum);
         const normStr = `esperado ${fmtNum(expected,2)} D • mínimo ${fmtNum(minimum,2)} D • DP ±${sd} D (18,5 − 0,33×idade)`;
-        html += normLine('AA — Push-up', fmtNum(aa,2)+' D', normStr, belowMin ? 'ABAIXO do mínimo' : renderZ(aa, expected, sd));
+        html += normLine('AA: Push-up', fmtNum(aa,2)+' D', normStr, belowMin ? 'ABAIXO do mínimo' : renderZ(aa, expected, sd));
       }else{
-        html += normLine('AA — Push-up', fmtNum(aa,2)+' D', 'Sem norma (idade não definida)', '—');
+        html += normLine('AA: Push-up', fmtNum(aa,2)+' D', 'Sem norma (idade não definida)', '—');
       }
     }
     const aaMinus = data.aa_minus;
@@ -2232,9 +2231,9 @@ function saveBinocular(){
         const delta = aaMinus - expected;
         const normStr = `esperado ${fmtNum(expected,2)} D (≈ Push-up − 2,00 D)`;
         const zStr = `Δ=${fmtNum(delta,2)} D`;
-        html += normLine('AA — Minus lens', fmtNum(aaMinus,2)+' D', normStr, zStr);
+        html += normLine('AA: Minus lens', fmtNum(aaMinus,2)+' D', normStr, zStr);
       }else{
-        html += normLine('AA — Minus lens', fmtNum(aaMinus,2)+' D', 'Regra: ≈ Push-up − 2,00 D', '—');
+        html += normLine('AA: Minus lens', fmtNum(aaMinus,2)+' D', 'Regra: ≈ Push-up − 2,00 D', '—');
       }
     }
 
@@ -2827,7 +2826,7 @@ function showTabById(t){
       {value:'absent', label:'Ausente'}
     ]);
 
-    // Estereopsia (arcseg) — registro apenas (sem norma automática)
+    // Estereopsia (arcseg), registro apenas (sem norma automática)
     const stereoCommon = [
       {value:'no_stereo', label:'Sem estereopsia'},
       {value:40, label:'40"'},
@@ -2841,7 +2840,7 @@ function showTabById(t){
       {value:800, label:'800"'}
     ];
     const circles = el('bnv_titmus_circles'); if(circles) buildSelectOptionsList(circles, stereoCommon);
-    // Dot 2: campo numérico (arcseg) — valores variam por kit; não fixa lista como norma
+    // Dot 2: campo numérico (arcseg), valores variam por kit; não fixa lista como norma
     // Sugestões ficam no <datalist> do HTML.
 
     const btnSave = el('btn_bnv_salvar'); if(btnSave) btnSave.addEventListener('click', saveBinocularVision);
@@ -2888,7 +2887,7 @@ function showTabById(t){
 
     takeSelect('bnv_titmus_fly','titmus_fly');
     takeSelect('bnv_titmus_circles','titmus_circles_arcsec');
-    // Dot 2 (arcseg) — entrada numérica
+    // Dot 2 (arcseg), entrada numérica
     const dot2El = el('bnv_dot2');
     if(dot2El){
       const v = String(dot2El.value||'').trim();
@@ -3084,18 +3083,18 @@ function showTabById(t){
     const lines = [];
     const fails = [];
     function okLine(name, extra){
-      lines.push(`✅ ${name}${extra?(' — '+extra):''}`);
+      lines.push(`✅ ${name}${extra?(': '+extra):''}`);
     }
     function badLine(name, extra){
-      lines.push(`❌ ${name}${extra?(' — '+extra):''}`);
-      fails.push(name + (extra?(' — '+extra):''));
+      lines.push(`❌ ${name}${extra?(': '+extra):''}`);
+      fails.push(name + (extra?(': '+extra):''));
     }
     function safe(name, fn){
       try{ fn(); okLine(name); }
       catch(e){ badLine(name, String(e && e.message ? e.message : e)); }
     }
 
-    lines.push('Self-Test — ' + new Date().toLocaleString('pt-BR'));
+    lines.push('Self-Test: ' + new Date().toLocaleString('pt-BR'));
     lines.push('------------------------------------------------------------');
 
     // 1) Normas carregadas
@@ -3151,7 +3150,7 @@ function showTabById(t){
     }
 
 
-    // 3b) Visão binocular — IDs e selects
+    // 3b) Visão binocular, IDs e selects
     const bnvRequired = [
       'bnv_w4d_distance','bnv_w4d_near','bnv_w4d_notes',
       'bnv_titmus_fly','bnv_titmus_circles','bnv_dot2','bnv_stereo_notes',

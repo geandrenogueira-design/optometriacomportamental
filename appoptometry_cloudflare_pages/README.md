@@ -1,4 +1,4 @@
-# Optometria comportamental — app clínico (Instituto Olhar)
+# Optometria comportamental: app clínico (Instituto Olhar)
 
 App clínico de optometria comportamental: TVPS-4, DTVP-3, DEM, NSUCO, vergência e acomodação, visão binocular e painel integrado.
 
@@ -58,7 +58,7 @@ Essa chave assina as sessões e é pedida **uma única vez**, no primeiro acesso
 
 ### 5. Teste
 1. No cartão **Nuvem e backup**, confira se aparece o seu e-mail e o status "ok".
-2. Cadastre um paciente fictício. O status deve passar para "ok — salvo na nuvem".
+2. Cadastre um paciente fictício. O status deve passar para "ok, salvo na nuvem".
 3. Abra o app em outro aparelho, entre com o mesmo e-mail e senha e confira se o paciente aparece.
 
 ### 6. Esqueci a senha (envio por e-mail)

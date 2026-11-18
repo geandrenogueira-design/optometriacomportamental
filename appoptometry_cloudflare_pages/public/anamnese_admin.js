@@ -8,7 +8,7 @@
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmtDate = (ms) => ms ? new Date(ms).toLocaleDateString('pt-BR') : '—';
-  const STATUS = { aguardando: 'Aguardando resposta', respondida: 'Respondida — pronta para importar', importada: 'Importada' };
+  const STATUS = { aguardando: 'Aguardando resposta', respondida: 'Respondida, pronta para importar', importada: 'Importada' };
 
   async function api(method, body, query){
     const res = await fetch(API + (query || ''), {
@@ -165,7 +165,7 @@
       case 'yesno': {
         const base = v === 'sim' ? 'Sim' : v === 'nao' ? 'Não' : '';
         const d = a[f.id + '_desc'];
-        return base + (d ? ' — ' + d : '');
+        return base + (d ? ': ' + d : '');
       }
       case 'consent': return v === true ? 'Aceito' : '';
       case 'multi': return Array.isArray(v) ? v.join(', ') : '';
@@ -198,7 +198,7 @@
         <td class="muted" style="font-size:12px">${esc(d.tests)}</td></tr>`).join('');
 
     const high = scaleItems.filter((it) => Number(sint[it.n]) >= 3)
-      .map((it) => `<li><b>${it.n}.</b> ${esc(it.t)} — <i>${esc(label(Number(sint[it.n])))}</i>${it.ask ? ' <span class="muted" style="font-size:12px">(relato da criança)</span>' : ''}</li>`).join('');
+      .map((it) => `<li><b>${it.n}.</b> ${esc(it.t)}: <i>${esc(label(Number(sint[it.n])))}</i>${it.ask ? ' <span class="muted" style="font-size:12px">(relato da criança)</span>' : ''}</li>`).join('');
 
     const details = S.sections.filter((s) => s.id !== 's9').map((s) => {
       const lines = s.fields.filter((f) => f.type !== 'heading').map((f) => {

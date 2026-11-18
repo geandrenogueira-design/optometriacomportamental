@@ -48,11 +48,11 @@ async function sendResetEmail(env, to, link) {
     <p style="margin:22px 0"><a href="${escHtml(link)}" style="background:#1e2d68;color:#fff;text-decoration:none;padding:12px 20px;border-radius:10px;display:inline-block">Criar nova senha</a></p>
     <p style="font-size:13px;color:#4f5a70">O link vale por ${RESET_MINUTES} minutos e só pode ser usado uma vez. Se você não pediu a troca, ignore este e-mail: a senha atual continua valendo.</p>
     <p style="font-size:12px;color:#4f5a70;word-break:break-all">Se o botão não abrir, copie este endereço: ${escHtml(link)}</p></div>`;
-  const text = `Instituto Olhar — redefinição de senha\n\nAbra o link para criar uma nova senha (vale ${RESET_MINUTES} minutos, uso único):\n${link}\n\nSe você não pediu a troca, ignore este e-mail.`;
+  const text = `Instituto Olhar, redefinição de senha\n\nAbra o link para criar uma nova senha (vale ${RESET_MINUTES} minutos, uso único):\n${link}\n\nSe você não pediu a troca, ignore este e-mail.`;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: [to], subject: 'Redefinir senha — Instituto Olhar', html, text }),
+    body: JSON.stringify({ from, to: [to], subject: 'Redefinir senha · Instituto Olhar', html, text }),
   });
   return res.ok;
 }

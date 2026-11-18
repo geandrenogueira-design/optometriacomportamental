@@ -1,4 +1,4 @@
-// /api/migrate-kv — migração única dos dados da versão anterior (chave de sync no KV).
+// /api/migrate-kv, migração única dos dados da versão anterior (chave de sync no KV).
 // Exige login no app. Só LÊ o KV antigo (binding OPTO_KV); não grava nada nele.
 // Depois que os dados forem trazidos, o binding OPTO_KV pode ser removido do projeto.
 import { json, authenticate } from '../../lib/auth.js';

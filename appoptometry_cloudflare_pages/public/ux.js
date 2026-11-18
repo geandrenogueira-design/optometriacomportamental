@@ -46,7 +46,7 @@
     } else {
       const done = STEPS.filter((s)=> stepState(p, s)).length;
       const sex = p.sex === 'F' ? 'F' : p.sex === 'M' ? 'M' : (p.sex || '');
-      const dots = STEPS.map((s)=>{ const st = stepState(p, s); return `<span class="pt-dot ${st}" title="${esc(s.label)}${st==='done'?' — feito':st==='skip'?' — não testado':''}"></span>`; }).join('');
+      const dots = STEPS.map((s)=>{ const st = stepState(p, s); return `<span class="pt-dot ${st}" title="${esc(s.label)}${st==='done'?': feito':st==='skip'?': não testado':''}"></span>`; }).join('');
       bar.innerHTML = `${menuBtn}<div class="pt-main"><div class="pt-name">${esc(p.name)}</div>
         <div class="pt-sub">${ageStr(p.dob)}${sex ? ' · ' + esc(sex) : ''} · <span class="pt-dots" aria-label="${done} de ${STEPS.length} etapas">${dots}</span> ${done}/${STEPS.length} etapas</div></div>
         <div class="pt-save" id="pt_save" aria-live="polite">${esc(saveNote)}</div>`;
@@ -245,7 +245,7 @@
   // ------------------------------------------------------------ relatório
   const RP_FIELDS = ['rp_impressao','rp_conduta','rp_encaminhamentos','rp_destino','rp_data'];
   const SIGN_KEY = 'olhar_assinatura';
-  const DEFAULT_SIGN = 'Geandré Nogueira — Optometrista comportamental — CROO 1726';
+  const DEFAULT_SIGN = 'Geandré Nogueira · Optometrista comportamental · CROO-PE 1726';
   function saveReportFields(){
     const p = B.getSelectedPatient(); if (!p) return;
     p.report = p.report || {};
@@ -325,7 +325,7 @@
     if (r.conduta) html += `<section><h3>Conduta e plano</h3><p>${nl(r.conduta)}</p></section>`;
     if (r.encaminhamentos) html += `<section><h3>Encaminhamentos e orientações</h3><p>${nl(r.encaminhamentos)}</p></section>`;
     const sign = ($('rp_assinatura') && $('rp_assinatura').value) || DEFAULT_SIGN;
-    html += `<footer class="rp-sign"><div class="rp-line"></div><div>${esc(sign)}</div><div class="rp-addr">Instituto Olhar · Comercial Mauro Lima, sala 105 — Praça João Pessoa, 33, Centro, Garanhuns-PE · (87) 99936-0210</div></footer>`;
+    html += `<footer class="rp-sign"><div class="rp-line"></div><div>${esc(sign)}</div><div class="rp-addr">Instituto Olhar · Comercial Mauro Lima, sala 105, Praça João Pessoa, 33, Centro, Garanhuns-PE · (87) 99936-0210</div></footer>`;
     doc.innerHTML = html;
   }
 
